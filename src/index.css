@@ -16,3 +16,8 @@
 :-webkit-autofill:active {
   font-family: "Muli", "sans-serif" !important;
 }
+
+body {
+  margin: 0;
+  padding: 0;
+}

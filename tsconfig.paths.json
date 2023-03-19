@@ -3,10 +3,12 @@
     "baseUrl": ".",
     "paths": {
       "&components/*": ["./src/components/*"],
+      "&pages/*": ["./src/pages/*"],
       "&config/*": ["./src/config/*"],
       "&assets/*": ["./src/assets/*"],
-      "&locales/*": ["./src/locales/*"],
       "&utils/*": ["./src/utils/*"],
+      "&constants/*": ["./src/constants/*"],
+      "&types/*": ["./src/types/*"],
       "&hooks/*": ["./src/hooks/*"]
     }
   }
