@@ -4,5 +4,7 @@ export enum Paths {
   Register = "/register",
   Jobs = "/jobs",
   Job = "/jobs/:id",
+  JobEdit = "/jobs/:id/edit",
+  JobNew = "/jobs/new",
   Results = "/jobs/:id/results",
 }

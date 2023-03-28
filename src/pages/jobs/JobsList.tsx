@@ -1,70 +1,37 @@
-import React, { useState } from "react";
-import { Table, Tag } from "antd";
+import React from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useCollection } from "react-firebase-hooks/firestore";
+import { useNavigate } from "react-router-dom";
+import { Button, Result, Row, Table, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
+import { collection, query, where } from "firebase/firestore";
 
+import JobActions from "./JobActions";
+
+import { auth, store } from "&config/firebase";
 import { StatusColors } from "&constants/colors";
+import { Paths } from "&constants/paths";
 import { JobStatus, SearchJob } from "&types/index";
 
-const mockJobs: SearchJob[] = [
-  {
-    id: "1",
-    name: "Job 1",
-    description: "Job 1 description",
-    query: {
-      include: ["include 1", "include 2"],
-      exclude: ["exclude 1", "exclude 2"],
-      query: "query 1",
-      from: new Date(),
-      to: new Date(),
-    },
-    schedule: {
-      interval: 1,
-      unit: "days",
-    },
-    status: JobStatus.INACTIVE,
-    lastUpdatedTime: new Date(),
-  },
-  {
-    id: "2",
-    name: "Job 2",
-    description: "Job 2 description",
-    query: {
-      include: ["include 1", "include 2"],
-      exclude: ["exclude 1", "exclude 2"],
-      query: "query 1",
-      from: new Date(),
-      to: new Date(),
-    },
-    schedule: {
-      interval: 1,
-      unit: "days",
-    },
-    status: JobStatus.ACTIVE,
-    lastUpdatedTime: new Date(),
-  },
-  {
-    id: "3",
-    name: "Job 3",
-    description: "Job 3 description",
-    query: {
-      include: ["include 1", "include 2"],
-      exclude: ["exclude 1", "exclude 2"],
-      query: "query 1",
-      from: new Date(),
-      to: new Date(),
-    },
-    schedule: {
-      interval: 15,
-      unit: "seconds",
-    },
-    status: JobStatus.INACTIVE,
-    lastUpdatedTime: new Date(),
-  },
-];
-
 const JobsList = () => {
-  const [jobs, setJobs] = useState(mockJobs);
+  const navigate = useNavigate();
+  const [user] = useAuthState(auth);
+  const userId = user?.uid;
+
+  /**
+   * Get all jobs for the current user
+   * There are already sufficient rules in place to ensure that
+   * only the current user can access their own jobs
+   */
+  const [result, loading, error] = useCollection(
+    query(collection(store, "jobs"), where("userId", "==", userId))
+  );
+
+  const dataSource = result?.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as SearchJob[];
 
   const columns: ColumnsType<SearchJob> = [
     {
@@ -106,12 +73,32 @@ const JobsList = () => {
       sorter: (a, b) =>
         Number(a.lastRunTime?.getTime()) - Number(b.lastRunTime?.getTime()),
     },
+    {
+      render: (_, { id, status }) =>
+        id && <JobActions id={id} status={status} />,
+    },
   ];
+
+  const goToNewJob = () => navigate(Paths.JobNew);
+
+  if (error) {
+    return <Result status="error" title="Error" subTitle={error?.message} />;
+  }
 
   return (
     <div>
-      <Title level={2}>Jobs</Title>
-      <Table dataSource={jobs} columns={columns} />
+      <Row justify={"space-between"} align={"middle"}>
+        <Title level={2}>Jobs</Title>
+        <Button type="primary" onClick={goToNewJob}>
+          New Job
+        </Button>
+      </Row>
+      <Table
+        dataSource={dataSource}
+        columns={columns}
+        loading={loading}
+        key={"id"}
+      />
     </div>
   );
 };
