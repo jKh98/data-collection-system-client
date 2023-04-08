@@ -3,19 +3,19 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { useParams } from "react-router-dom";
 import { message, Result } from "antd";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
 import JobForm from "./forms/JobForm";
 
 import Splash from "&components/Splash";
 import { auth, store } from "&config/firebase";
-import { JobStatus, SearchJob } from "&types/index";
 import { removeDeepEmpty } from "&utils/transform";
 
 const EditJob = () => {
   const { id } = useParams();
   const [user] = useAuthState(auth);
-  const [jobDoc, loading, error] = useDocument(doc(store, "jobs", id!));
+  const jobRef = doc(store, "jobs", id!);
+  const [jobDoc, loading, error] = useDocument(jobRef);
   const [submitting, setSubmitting] = useState(false);
   const job = jobDoc?.data() as SearchJob;
 
@@ -25,21 +25,21 @@ const EditJob = () => {
     name: "",
     description: "",
     query: { q: "" },
-    schedule: { interval: "" },
-    status: JobStatus.PROCESSING,
+    schedule: { interval: 0, unit: "seconds" },
+    status: "active",
   };
 
   const onSubmit = (values: typeof initialValues) => {
-    const jobRef = doc(collection(store, "jobs"), id!);
+    console.log(values);
     const updatedJob: SearchJob = {
       ...values,
       id: jobRef.id,
       userId: user!.uid,
-      status: JobStatus.PROCESSING,
-      createdTime: new Date(),
-      lastUpdatedTime: new Date(),
+      status: "active",
+      lastUpdatedTime: new Date().toISOString(),
     };
 
+    console.log(removeDeepEmpty(updatedJob));
     setSubmitting(true);
     setDoc(jobRef, removeDeepEmpty(updatedJob))
       .then(() => message.success("Job updated successfully"))

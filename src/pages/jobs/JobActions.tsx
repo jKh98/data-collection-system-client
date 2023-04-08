@@ -10,11 +10,10 @@ import {
 import { Button, Dropdown, MenuProps, Space } from "antd";
 
 import { Paths } from "&constants/paths";
-import { JobStatus } from "&types/index";
 
 interface JobActionsProps {
   id: string;
-  status: JobStatus;
+  status: jobStatus;
 }
 
 const JobActions = ({ id, status }: JobActionsProps) => {
@@ -25,12 +24,7 @@ const JobActions = ({ id, status }: JobActionsProps) => {
       label: "Edit",
       key: "1",
       icon: <EditOutlined />,
-      onClick: () => {
-        console.log(id);
-        const path = generatePath(Paths.JobEdit, { id });
-        console.log(path);
-        navigate(path);
-      },
+      onClick: (e) => navigate(generatePath(Paths.JobEdit, { id })),
     },
     {
       label: "Run",
@@ -52,11 +46,11 @@ const JobActions = ({ id, status }: JobActionsProps) => {
     },
   ];
 
-  const menuProps = { items };
+  const menuProps: MenuProps = { items };
 
   return (
     <Dropdown menu={menuProps}>
-      <Button>
+      <Button onClick={(e) => e.stopPropagation()}>
         <Space>
           Actions
           <DownOutlined />

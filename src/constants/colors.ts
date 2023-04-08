@@ -1,8 +1,8 @@
-import { JobStatus } from "&types/index";
-
-export const StatusColors = {
-  [JobStatus.PROCESSING]: "blue",
-  [JobStatus.ACTIVE]: "green",
-  [JobStatus.PAUSED]: "orange",
-  [JobStatus.STOPPED]: "red",
+export const StatusColors: {
+  [K in jobStatus]: string;
+} = {
+  running: "blue",
+  active: "green",
+  paused: "orange",
+  stopped: "red",
 };

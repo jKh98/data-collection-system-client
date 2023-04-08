@@ -6,21 +6,22 @@ import {
   Card,
   Col,
   Collapse,
+  DatePicker,
   Form,
   Input,
+  InputNumber,
   Row,
   Select,
   Switch,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import Title from "antd/es/typography/Title";
 
 import NewsApiForm from "./NewsApiForm";
 import RedditApiForm from "./RedditApiForm";
 import TwitterApiForm from "./TwitterApiForm";
 
+import { PageHeader } from "&components/Page";
 import { Paths } from "&constants/paths";
-import { DataSource, SearchJob } from "&types/index";
 
 interface JobFormProps {
   onSubmit: (values: SearchJob) => void;
@@ -33,15 +34,15 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
   const { id } = initialValues;
   const navigate = useNavigate();
 
-  const sources: DataSource[] = Form.useWatch(["query", "sources"], form) || [];
+  const sources: dataSource[] = Form.useWatch(["query", "sources"], form) || [];
   const noSources = !sources?.length;
 
-  const checkSource = (ds: DataSource) => sources.includes(ds);
+  const checkSource = (ds: dataSource) => sources.includes(ds);
 
-  const setSources = (dss: DataSource[]) =>
+  const setSources = (dss: dataSource[]) =>
     form.setFieldValue(["query", "sources"], dss);
 
-  const sourceSelector = (ds: DataSource) => () => {
+  const sourceSelector = (ds: dataSource) => () => {
     if (sources.includes(ds)) {
       setSources(sources.filter((source) => source !== ds));
     } else {
@@ -53,7 +54,7 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
 
   return (
     <Fragment>
-      <Title level={2}>{id ? `Edit Job: ${id}` : `New Job`}</Title>
+      <PageHeader title={id ? `Edit Job: ${id}` : `New Job`} withBack />
       <Form
         form={form}
         name="job"
@@ -80,8 +81,32 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
             </Card>
             <br />
             <Card title={"Schedule"}>
-              <Form.Item name={["schedule", "interval"]} label="Interval">
-                <Input />
+              <Form.Item label="Interval" required>
+                <Input.Group compact>
+                  <Form.Item
+                    noStyle
+                    name={["schedule", "interval"]}
+                    rules={[
+                      { required: true, message: "Interval is required" },
+                      { type: "number", min: 0 },
+                    ]}
+                  >
+                    <InputNumber min={0} />
+                  </Form.Item>
+                  <Form.Item noStyle name={["schedule", "unit"]}>
+                    <Select style={{ minWidth: 120 }}>
+                      <Select.Option key={"minutes"}>minutes</Select.Option>
+                      <Select.Option key={"hours"}>hours</Select.Option>
+                      <Select.Option key={"days"}>days</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </Input.Group>
+              </Form.Item>
+              <Form.Item name={["schedule", "startTime"]} label="Start Time">
+                <DatePicker showTime />
+              </Form.Item>
+              <Form.Item name={["schedule", "endTime"]} label="End Time">
+                <DatePicker showTime />
               </Form.Item>
             </Card>
             <br />
@@ -112,54 +137,54 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
                 rules={[{ required: true }]}
               >
                 <Select mode="multiple">
-                  {Object.values(DataSource).map((v) => (
-                    <Select.Option key={v}>{v}</Select.Option>
-                  ))}
+                  <Select.Option key={"newsApi"}>News API</Select.Option>
+                  <Select.Option key={"twitterApi"}>Twitter</Select.Option>
+                  <Select.Option key={"redditApi"}>Reddit</Select.Option>
                 </Select>
               </Form.Item>
 
               <Collapse activeKey={sources}>
                 <Collapse.Panel
                   header="News API"
-                  key={DataSource.NEWS_API}
+                  key={"newsApi"}
                   showArrow={false}
                   collapsible="header"
                   extra={
                     <Switch
-                      checked={checkSource(DataSource.NEWS_API)}
-                      onChange={sourceSelector(DataSource.NEWS_API)}
+                      checked={checkSource("newsApi")}
+                      onChange={sourceSelector("newsApi")}
                     />
                   }
                 >
-                  {checkSource(DataSource.NEWS_API) && <NewsApiForm />}
+                  {checkSource("newsApi") && <NewsApiForm />}
                 </Collapse.Panel>
                 <Collapse.Panel
                   header="Twitter API"
-                  key={DataSource.TWITTER_API}
+                  key={"twitterApi"}
                   showArrow={false}
                   collapsible="header"
                   extra={
                     <Switch
-                      checked={checkSource(DataSource.TWITTER_API)}
-                      onChange={sourceSelector(DataSource.TWITTER_API)}
+                      checked={checkSource("twitterApi")}
+                      onChange={sourceSelector("twitterApi")}
                     />
                   }
                 >
-                  {checkSource(DataSource.TWITTER_API) && <TwitterApiForm />}
+                  {checkSource("twitterApi") && <TwitterApiForm />}
                 </Collapse.Panel>
                 <Collapse.Panel
                   header="Reddit API"
-                  key={DataSource.REDDIT_API}
+                  key={"redditApi"}
                   showArrow={false}
                   collapsible="header"
                   extra={
                     <Switch
-                      checked={checkSource(DataSource.REDDIT_API)}
-                      onChange={sourceSelector(DataSource.REDDIT_API)}
+                      checked={checkSource("twitterApi")}
+                      onChange={sourceSelector("twitterApi")}
                     />
                   }
                 >
-                  {checkSource(DataSource.REDDIT_API) && <RedditApiForm />}
+                  {checkSource("twitterApi") && <RedditApiForm />}
                 </Collapse.Panel>
               </Collapse>
             </Card>

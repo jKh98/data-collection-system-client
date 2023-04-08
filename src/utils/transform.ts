@@ -1,8 +1,8 @@
-import { isEmpty, isObject, transform } from "lodash";
+import { isNil, isObject, transform } from "lodash";
 
 export const removeDeepEmpty = (obj: any) =>
   transform(obj, (result: any, value, key) => {
-    if (!isEmpty(value)) {
+    if (!isNil(value)) {
       result[key] = isObject(value) ? removeDeepEmpty(value) : value;
     }
   });

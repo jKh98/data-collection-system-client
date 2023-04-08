@@ -1,14 +1,16 @@
 import { Fragment } from "react";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { Navigate, useParams } from "react-router-dom";
-import { Result } from "antd";
-import Title from "antd/es/typography/Title";
+import { Card, Col, Divider, Result, Row, Tag, Typography } from "antd";
 import { doc } from "firebase/firestore";
 
+import JobActions from "./JobActions";
+
+import { PageHeader } from "&components/Page";
 import Splash from "&components/Splash";
 import { store } from "&config/firebase";
+import { StatusColors } from "&constants/colors";
 import { Paths } from "&constants/paths";
-import { SearchJob } from "&types/index";
 
 const Job = () => {
   const { id } = useParams();
@@ -37,9 +39,49 @@ const Job = () => {
     );
   }
 
+  const { status } = job;
+
   return (
     <Fragment>
-      <Title level={2}>{`Job: ${id}`}</Title>
+      <PageHeader
+        title={
+          <Fragment>
+            Job: {id}
+            <Divider type="vertical" />
+            <Tag
+              color={StatusColors[status]}
+              style={{ verticalAlign: "middle" }}
+            >
+              {status}
+            </Tag>
+          </Fragment>
+        }
+        withBack
+        extra={[<JobActions id={id} status={status} />]}
+      />
+
+      <Card title="Job Details">
+        <Row gutter={16}>
+          <Col span={12}>
+            <Typography.Text strong>Name</Typography.Text>
+            <Typography.Paragraph>{job.name}</Typography.Paragraph>
+          </Col>
+
+          <Col span={12}>
+            <Typography.Text strong>Description</Typography.Text>
+            <Typography.Paragraph>{job.description}</Typography.Paragraph>
+          </Col>
+
+          <Col span={12}>
+            <Typography.Text strong>Schedule</Typography.Text>
+            <Typography.Paragraph>
+              {job.schedule.interval} {job.schedule.unit}
+            </Typography.Paragraph>
+          </Col>
+        </Row>
+      </Card>
+      <br />
+      <Card title="Results"></Card>
     </Fragment>
   );
 };

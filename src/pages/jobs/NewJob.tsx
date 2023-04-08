@@ -6,7 +6,6 @@ import { collection, doc, setDoc } from "firebase/firestore";
 import JobForm from "./forms/JobForm";
 
 import { auth, store } from "&config/firebase";
-import { JobStatus, SearchJob } from "&types/index";
 import { removeDeepEmpty } from "&utils/transform";
 
 const NewJob = () => {
@@ -19,8 +18,8 @@ const NewJob = () => {
     name: "",
     description: "",
     query: { q: "", sources: [] },
-    schedule: { interval: "" },
-    status: JobStatus.PROCESSING,
+    schedule: { interval: 0, unit: "seconds" },
+    status: "active",
   };
 
   const onSubmit = (values: typeof initialValues) => {
@@ -29,8 +28,8 @@ const NewJob = () => {
       ...values,
       id: newJobRef.id,
       userId: user!.uid,
-      status: JobStatus.PROCESSING,
-      createdTime: new Date(),
+      status: "active",
+      createdTime: new Date().toISOString(),
     };
 
     setSubmitting(true);

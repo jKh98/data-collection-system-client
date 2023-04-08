@@ -1,9 +1,9 @@
 import React from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { Layout, message, notification } from "antd";
-import { Content, Header } from "antd/es/layout/layout";
 
+import { Content, Header } from "&components/Layout";
 import ProtectedRoute from "&components/ProtectedRoute";
 import Splash from "&components/Splash";
 import { auth } from "&config/firebase";
@@ -18,7 +18,6 @@ import Results from "&pages/Results/Results";
 function App() {
   notification.config({ maxCount: 1, duration: 3 });
 
-  const navigate = useNavigate();
   const [user, loading, error] = useAuthState(auth);
   const isAuthenticated = !!user;
 
@@ -38,19 +37,8 @@ function App() {
       <Route
         element={
           <Layout>
-            <Header
-              style={{ color: "white", fontWeight: "bold" }}
-              onClick={() => navigate(Paths.Home)}
-            >
-              Data Collection System
-            </Header>
-            <Content
-              style={{
-                padding: "24px",
-                height: "calc(100vh - 64px)",
-                overflow: "auto",
-              }}
-            >
+            <Header />
+            <Content>
               <ProtectedRoute
                 validator={isAuthenticated}
                 fallback={Paths.LogIn}

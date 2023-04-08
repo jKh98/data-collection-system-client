@@ -1,18 +1,17 @@
 import React from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { useNavigate } from "react-router-dom";
-import { Button, Result, Row, Table, Tag } from "antd";
+import { generatePath, useNavigate } from "react-router-dom";
+import { Button, Result, Table, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
-import Title from "antd/es/typography/Title";
 import { collection, query, where } from "firebase/firestore";
 
 import JobActions from "./JobActions";
 
+import { PageHeader } from "&components/Page";
 import { auth, store } from "&config/firebase";
 import { StatusColors } from "&constants/colors";
 import { Paths } from "&constants/paths";
-import { JobStatus, SearchJob } from "&types/index";
 
 const JobsList = () => {
   const navigate = useNavigate();
@@ -60,8 +59,7 @@ const JobsList = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      sorter: (a, b) => a.status.localeCompare(b.status),
-      render: (status: JobStatus) => (
+      render: (status: jobStatus) => (
         <Tag color={StatusColors[status]}>{status}</Tag>
       ),
     },
@@ -71,7 +69,7 @@ const JobsList = () => {
       key: "lastRunTime",
       render: (lastRunTime) => lastRunTime?.toLocaleString() || "-",
       sorter: (a, b) =>
-        Number(a.lastRunTime?.getTime()) - Number(b.lastRunTime?.getTime()),
+        Date.parse(a.lastRunTime || "") - Date.parse(b.lastRunTime || ""),
     },
     {
       render: (_, { id, status }) =>
@@ -87,17 +85,23 @@ const JobsList = () => {
 
   return (
     <div>
-      <Row justify={"space-between"} align={"middle"}>
-        <Title level={2}>Jobs</Title>
-        <Button type="primary" onClick={goToNewJob}>
-          New Job
-        </Button>
-      </Row>
+      <PageHeader
+        title="Jobs"
+        extra={[
+          <Button key="new-job" type="primary" onClick={goToNewJob}>
+            New Job
+          </Button>,
+        ]}
+      />
+
       <Table
         dataSource={dataSource}
         columns={columns}
         loading={loading}
-        key={"id"}
+        rowKey={"id"}
+        onRow={(record) => ({
+          onClick: () => navigate(generatePath(Paths.Job, { id: record.id! })),
+        })}
       />
     </div>
   );
