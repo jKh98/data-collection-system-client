@@ -25,7 +25,7 @@ import { Paths } from "&constants/paths";
 
 interface JobFormProps {
   onSubmit: (values: SearchJob) => void;
-  initialValues: SearchJob;
+  initialValues: Partial<SearchJob>;
   submitting?: boolean;
 }
 
@@ -179,12 +179,12 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
                   collapsible="header"
                   extra={
                     <Switch
-                      checked={checkSource("twitterApi")}
-                      onChange={sourceSelector("twitterApi")}
+                      checked={checkSource("redditApi")}
+                      onChange={sourceSelector("redditApi")}
                     />
                   }
                 >
-                  {checkSource("twitterApi") && <RedditApiForm />}
+                  {checkSource("redditApi") && <RedditApiForm />}
                 </Collapse.Panel>
               </Collapse>
             </Card>

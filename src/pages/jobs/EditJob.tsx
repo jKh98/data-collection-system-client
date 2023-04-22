@@ -3,12 +3,13 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { useParams } from "react-router-dom";
 import { message, Result } from "antd";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, Timestamp } from "firebase/firestore";
 
 import JobForm from "./forms/JobForm";
 
 import Splash from "&components/Splash";
 import { auth, store } from "&config/firebase";
+import { scheduleToSeconds } from "&utils/schedule";
 import { removeDeepEmpty } from "&utils/transform";
 
 const EditJob = () => {
@@ -36,7 +37,10 @@ const EditJob = () => {
       id: jobRef.id,
       userId: user!.uid,
       status: "active",
-      lastUpdatedTime: new Date().toISOString(),
+      lastUpdatedTime: Timestamp.now(),
+      nextRunTime: Timestamp.fromDate(
+        new Date(Date.now() + scheduleToSeconds(values?.schedule!) * 1000)
+      ),
     };
 
     console.log(removeDeepEmpty(updatedJob));

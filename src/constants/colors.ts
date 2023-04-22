@@ -3,6 +3,6 @@ export const StatusColors: {
 } = {
   running: "blue",
   active: "green",
-  paused: "orange",
-  stopped: "red",
+  stopped: "orange",
+  failed: "red",
 };

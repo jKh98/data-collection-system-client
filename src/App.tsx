@@ -13,7 +13,7 @@ import Job from "&pages/jobs/Job";
 import JobsList from "&pages/jobs/JobsList";
 import NewJob from "&pages/jobs/NewJob";
 import { Login } from "&pages/login/Login";
-import Results from "&pages/Results/Results";
+import Results from "&pages/results/Results";
 
 function App() {
   notification.config({ maxCount: 1, duration: 3 });

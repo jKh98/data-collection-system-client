@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 declare global {
   /**
    * A search job is triggered by a user to the backend system to start a scheduled search task
@@ -11,10 +13,10 @@ declare global {
     query: SearchQuery;
     schedule: Schedule;
     status: jobStatus;
-    createdTime?: string;
-    lastUpdatedTime?: string;
-    lastRunTime?: string;
-    nextRunTime?: string;
+    createdTime: Timestamp;
+    lastUpdatedTime?: Timestamp;
+    lastRunTime?: Timestamp;
+    nextRunTime: Timestamp;
   }
 
   interface SearchQuery {
@@ -61,9 +63,21 @@ declare global {
 
   type dataSource = "newsApi" | "twitterApi" | "redditApi";
 
-  type jobStatus = "running" | "active" | "paused" | "stopped";
+  type jobStatus = "running" | "active" | "stopped" | "failed";
 
-  type intervalUnit = "seconds" | "minutes" | "hours" | "days";
+  type intervalUnit = "minutes" | "hours" | "days";
+
+  interface SearchResult {
+    id: string;
+    jobId?: string;
+    source: dataSource;
+    title: string;
+    content: string;
+    url: string;
+    publishedAt?: string;
+    createdTime: Timestamp;
+    updatedTime?: Timestamp;
+  }
 }
 
 export {};

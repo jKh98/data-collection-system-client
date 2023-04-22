@@ -3,7 +3,6 @@ import { generatePath, useNavigate } from "react-router-dom";
 import {
   DownOutlined,
   EditOutlined,
-  PauseCircleOutlined,
   PlayCircleOutlined,
   StopOutlined,
 } from "@ant-design/icons";
@@ -19,12 +18,14 @@ interface JobActionsProps {
 const JobActions = ({ id, status }: JobActionsProps) => {
   const navigate = useNavigate();
 
+  const goToEditPage = () => navigate(generatePath(Paths.JobEdit, { id }));
+
   const items: MenuProps["items"] = [
     {
       label: "Edit",
       key: "1",
       icon: <EditOutlined />,
-      onClick: (e) => navigate(generatePath(Paths.JobEdit, { id })),
+      onClick: goToEditPage,
     },
     {
       label: "Run",
@@ -32,25 +33,29 @@ const JobActions = ({ id, status }: JobActionsProps) => {
       icon: <PlayCircleOutlined />,
     },
     {
-      label: "Pause",
-      key: "3",
-      icon: <PauseCircleOutlined />,
-      danger: true,
-    },
-    {
       label: "Stop",
-      key: "4",
+      key: "3",
       icon: <StopOutlined />,
       danger: true,
-      disabled: true,
     },
   ];
 
-  const menuProps: MenuProps = { items };
+  const menuProps: MenuProps = {
+    items,
+    onClick: (info) => {
+      info.domEvent.stopPropagation();
+      info.domEvent.preventDefault();
+    },
+  };
 
   return (
     <Dropdown menu={menuProps}>
-      <Button onClick={(e) => e.stopPropagation()}>
+      <Button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
         <Space>
           Actions
           <DownOutlined />

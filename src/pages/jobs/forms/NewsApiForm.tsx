@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
 import { DatePicker, Form, Input, Select } from "antd";
+import moment from "moment";
 
 const NewsApiForm = () => {
   return (
@@ -35,11 +36,57 @@ const NewsApiForm = () => {
       <Form.Item
         name={["query", "advancedQuery", "newsApi", "from"]}
         label="From"
+        rules={[
+          ({ getFieldValue }) => ({
+            validator(_, value) {
+              const toValue = getFieldValue([
+                "query",
+                "advancedQuery",
+                "newsApi",
+                "to",
+              ]);
+
+              if (!toValue) return Promise.resolve();
+              if (!value || value <= toValue) return Promise.resolve();
+
+              return Promise.reject(
+                new Error("From date should be before to date")
+              );
+            },
+          }),
+        ]}
       >
-        <DatePicker size="small" />
+        <DatePicker
+          size="small"
+          disabledDate={(current) =>
+            current && current < moment().subtract(1, "months")
+          }
+        />
       </Form.Item>
 
-      <Form.Item name={["query", "advancedQuery", "newsApi", "to"]} label="To">
+      <Form.Item
+        name={["query", "advancedQuery", "newsApi", "to"]}
+        label="To"
+        rules={[
+          ({ getFieldValue }) => ({
+            validator(_, value) {
+              const fromValue = getFieldValue([
+                "query",
+                "advancedQuery",
+                "newsApi",
+                "from",
+              ]);
+
+              if (!fromValue) return Promise.resolve();
+              if (!value || fromValue <= value) return Promise.resolve();
+
+              return Promise.reject(
+                new Error("To date should be after from date")
+              );
+            },
+          }),
+        ]}
+      >
         <DatePicker size="small" />
       </Form.Item>
 

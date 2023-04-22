@@ -4,7 +4,7 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import { generatePath, useNavigate } from "react-router-dom";
 import { Button, Result, Table, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { collection, query, where } from "firebase/firestore";
+import { collection, query, Timestamp, where } from "firebase/firestore";
 
 import JobActions from "./JobActions";
 
@@ -67,9 +67,19 @@ const JobsList = () => {
       title: "Last Run Time",
       dataIndex: "lastRunTime",
       key: "lastRunTime",
-      render: (lastRunTime) => lastRunTime?.toLocaleString() || "-",
+      render: (lastRunTime: Timestamp) =>
+        lastRunTime?.toDate().toLocaleString() || "-",
       sorter: (a, b) =>
-        Date.parse(a.lastRunTime || "") - Date.parse(b.lastRunTime || ""),
+        Number(a.lastRunTime?.toMillis()) - Number(b.lastRunTime?.toMillis()),
+    },
+    {
+      title: "Next Run Time",
+      dataIndex: "nextRunTime",
+      key: "nextRunTime",
+      render: (nextRunTime: Timestamp) =>
+        nextRunTime?.toDate().toLocaleString() || "-",
+      sorter: (a, b) =>
+        Number(a.nextRunTime?.toMillis()) - Number(b.nextRunTime?.toMillis()),
     },
     {
       render: (_, { id, status }) =>

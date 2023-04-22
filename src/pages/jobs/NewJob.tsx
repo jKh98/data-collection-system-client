@@ -1,24 +1,25 @@
 import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { message } from "antd";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { collection, doc, setDoc, Timestamp } from "firebase/firestore";
 
 import JobForm from "./forms/JobForm";
 
 import { auth, store } from "&config/firebase";
+import { scheduleToSeconds } from "&utils/schedule";
 import { removeDeepEmpty } from "&utils/transform";
 
 const NewJob = () => {
   const [user] = useAuthState(auth);
   const [submitting, setSubmitting] = useState(false);
 
-  const initialValues: SearchJob = {
+  const initialValues: Omit<SearchJob, "createdTime" | "nextRunTime"> = {
     id: undefined,
     userId: user!.uid,
     name: "",
     description: "",
     query: { q: "", sources: [] },
-    schedule: { interval: 0, unit: "seconds" },
+    schedule: { interval: 0, unit: "minutes" },
     status: "active",
   };
 
@@ -29,7 +30,10 @@ const NewJob = () => {
       id: newJobRef.id,
       userId: user!.uid,
       status: "active",
-      createdTime: new Date().toISOString(),
+      createdTime: Timestamp.now(),
+      nextRunTime: Timestamp.fromDate(
+        new Date(Date.now() + scheduleToSeconds(values?.schedule!) * 1000)
+      ),
     };
 
     setSubmitting(true);
