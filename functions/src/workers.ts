@@ -1,5 +1,6 @@
 import axios from "axios";
-import { createHash } from "crypto";
+
+import { idToHash } from "./utils";
 
 const newsApiKey = "852022f50f004f49b38b2884089813a9";
 const twitterApiKey = "your_twitter_api_key";
@@ -36,12 +37,13 @@ async function searchNewsApi(query: SearchQuery): Promise<SearchResult[]> {
   return articles.map(
     (article: any) =>
       ({
-        id: createHash("md5").update(article.url).digest("hex"),
+        id: idToHash(article.url),
         source: "newsApi",
         title: article.title,
-        desctiption: article.description,
+        description: article.description,
         content: article.content,
         url: article.url,
+        imageUrl: article.urlToImage,
         publishedAt: article.publishedAt,
       } as SearchResult)
   );
@@ -77,11 +79,12 @@ async function searchTwitterApi(query: SearchQuery): Promise<SearchResult[]> {
   return tweets.map(
     (tweet: any) =>
       ({
-        id: createHash("md5").update(tweet.id).digest("hex"),
+        id: idToHash(tweet.id),
         source: "twitterApi",
         title: tweet.text,
-        desctiption: tweet.text,
+        description: tweet.text,
         content: tweet.text,
+        imageUrl: tweet?.attachments?.media_keys[0] || null,
         url: `https://twitter.com/${tweet.author_id}/status/${tweet.id}`,
         publishedAt: tweet.created_at,
       } as SearchResult)
@@ -97,11 +100,7 @@ async function searchRedditApi(query: SearchQuery): Promise<SearchResult[]> {
   }/search.json`;
 
   const response = await axios.get(redditApiEndpoint, {
-    params: {
-      q: redditApiQuery || q,
-      t,
-      limit,
-    },
+    params: { q: redditApiQuery || q, t, limit },
   });
 
   const posts = response.data.data.children;
@@ -109,12 +108,13 @@ async function searchRedditApi(query: SearchQuery): Promise<SearchResult[]> {
   return posts.map(
     (post: any) =>
       ({
-        id: createHash("md5").update(post.data.id).digest("hex"),
+        id: idToHash(post.data.id),
         source: "redditApi",
         title: post.data.title,
-        desctiption: post.data.selftext,
-        content: post.data.selftext,
-        url: post.data.url,
+        description: post.data.selftext,
+        content: post.data.selftext_html || post.data.selftext,
+        url: `https://www.reddit.com${post.data.permalink}`,
+        imageUrl: post.data.thumbnail,
         publishedAt: new Date(post.data.created_utc * 1000).toISOString(),
       } as SearchResult)
   );

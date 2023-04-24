@@ -1,3 +1,5 @@
+import { createHash } from "crypto";
+
 export const scheduleToSeconds = (schedule: Schedule) => {
   const { interval, unit } = schedule;
 
@@ -21,18 +23,21 @@ export const checkResultChanged = (
     return true;
   }
 
-  const { content, title, url, desctiption } = result;
+  const { content, title, url, description } = result;
   const {
     content: docContent,
     title: docTitle,
     url: docUrl,
-    desctiption: docDesctiption,
+    description: docdescription,
   } = doc.data() || {};
 
   return (
     content !== docContent ||
     title !== docTitle ||
     url !== docUrl ||
-    desctiption !== docDesctiption
+    description !== docdescription
   );
 };
+
+export const idToHash = (id: string) =>
+  createHash("md5").update(id).digest("hex");

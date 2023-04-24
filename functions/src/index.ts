@@ -1,13 +1,66 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
+import * as puppeteer from "puppeteer";
 
 import { checkResultChanged, scheduleToSeconds } from "./utils";
 import { workers } from "./workers";
 admin.initializeApp();
 const db = admin.firestore();
 
+export async function urlToPdf(resultId: string, url: string) {
+  try {
+    // Launch a headless browser.
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    console.log("Browser launched");
+    const page = await browser.newPage();
+    console.log("New page created");
+
+    // Navigate to the URL.
+    await page.goto(url, { waitUntil: "networkidle2" });
+    console.log("Page loaded");
+
+    // Generate the PDF.
+    const pdfPath = path.join(os.tmpdir(), "page.pdf");
+    await page.pdf({ path: pdfPath, format: "A4" });
+    console.log("PDF generated");
+
+    // Upload the PDF to Firebase Storage.
+    const bucket = admin.storage().bucket();
+    const storagePath = `pdfs/${resultId}.pdf`;
+    await bucket.upload(pdfPath, {
+      destination: storagePath,
+      metadata: {
+        contentType: "application/pdf",
+        metadata: { firebaseStorageDownloadTokens: Date.now() },
+      },
+    });
+    console.log("PDF uploaded");
+
+    // Delete the local PDF file.
+    fs.unlinkSync(pdfPath);
+    console.log("Local file deleted");
+
+    // Return the URL of the uploaded PDF.
+    const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${
+      bucket.name
+    }/o/${encodeURIComponent(storagePath)}?alt=media&token=${Date.now()}`;
+
+    return downloadUrl;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
 export const jobScheduler = functions
-  .runWith({ memory: "2GB" })
+  .runWith({ memory: "2GB", timeoutSeconds: 120 })
   .pubsub.schedule("* * * * *")
   .onRun(async (context) => {
     // Consistent timestamp
@@ -39,20 +92,29 @@ export const jobScheduler = functions
 
                 // check if result already exists, if not create it, if so update it
                 const resultRef = db.collection("results").doc(result.id);
-                resultRef.get().then((doc) => {
+                resultRef.get().then(async (doc) => {
                   if (doc.exists) {
                     if (checkResultChanged(result, doc)) {
+                      const pdfUrl = await urlToPdf(result.id, result.url);
+
                       // update result
-                      resultRef.update({ ...result, updatedTime: now });
+                      await resultRef.update({
+                        ...result,
+                        updatedTime: now,
+                        pdfUrl,
+                      });
                     }
                   } else {
+                    const pdfUrl = await urlToPdf(result.id, result.url);
+
                     // create result
-                    resultRef.set({
+                    await resultRef.set({
                       ...result,
                       createdTime: now,
                       updatedTime: now,
                       jobId: id,
                       userId,
+                      pdfUrl,
                     });
                   }
                 });
