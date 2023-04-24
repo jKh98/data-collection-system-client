@@ -151,6 +151,7 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
                   collapsible="header"
                   extra={
                     <Switch
+                      key={1}
                       checked={checkSource("newsApi")}
                       onChange={sourceSelector("newsApi")}
                     />
@@ -165,6 +166,7 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
                   collapsible="header"
                   extra={
                     <Switch
+                      key={1}
                       checked={checkSource("twitterApi")}
                       onChange={sourceSelector("twitterApi")}
                     />
@@ -179,6 +181,7 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
                   collapsible="header"
                   extra={
                     <Switch
+                      key={1}
                       checked={checkSource("redditApi")}
                       onChange={sourceSelector("redditApi")}
                     />

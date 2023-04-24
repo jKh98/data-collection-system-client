@@ -6,8 +6,10 @@ import {
   PlayCircleOutlined,
   StopOutlined,
 } from "@ant-design/icons";
-import { Button, Dropdown, MenuProps, Space } from "antd";
+import { Button, Dropdown, MenuProps, message, Space } from "antd";
+import { doc, setDoc } from "firebase/firestore";
 
+import { store } from "&config/firebase";
 import { Paths } from "&constants/paths";
 
 interface JobActionsProps {
@@ -18,7 +20,18 @@ interface JobActionsProps {
 const JobActions = ({ id, status }: JobActionsProps) => {
   const navigate = useNavigate();
 
+  const [isLoading, setLoading] = React.useState(false);
+
   const goToEditPage = () => navigate(generatePath(Paths.JobEdit, { id }));
+
+  const changeJobStatus = (newJobStatus: jobStatus) => () => {
+    const jobRef = doc(store, "jobs", id!);
+    setLoading(true);
+    setDoc(jobRef, { status: newJobStatus }, { merge: true })
+      .then(() => message.success("Job status updated"))
+      .catch((error) => message.error(`Failed to update job status: ${error}`))
+      .finally(() => setLoading(false));
+  };
 
   const items: MenuProps["items"] = [
     {
@@ -28,15 +41,19 @@ const JobActions = ({ id, status }: JobActionsProps) => {
       onClick: goToEditPage,
     },
     {
-      label: "Run",
+      label: "Start",
       key: "2",
       icon: <PlayCircleOutlined />,
+      onClick: changeJobStatus("active"),
+      disabled: status === "active",
     },
     {
       label: "Stop",
       key: "3",
       icon: <StopOutlined />,
       danger: true,
+      onClick: changeJobStatus("stopped"),
+      disabled: status === "stopped",
     },
   ];
 
@@ -51,6 +68,7 @@ const JobActions = ({ id, status }: JobActionsProps) => {
   return (
     <Dropdown menu={menuProps}>
       <Button
+        loading={isLoading}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();

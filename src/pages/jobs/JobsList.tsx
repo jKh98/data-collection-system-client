@@ -1,17 +1,20 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { generatePath, useNavigate } from "react-router-dom";
-import { Button, Result, Table, Tag } from "antd";
+import { Button, Result, Space, Table, Tag, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { collection, query, Timestamp, where } from "firebase/firestore";
 
 import JobActions from "./JobActions";
 
+import Source from "&components/DataSource";
+import DateTime from "&components/DateTime";
 import { PageHeader } from "&components/Page";
 import { auth, store } from "&config/firebase";
 import { StatusColors } from "&constants/colors";
 import { Paths } from "&constants/paths";
+import { scheduleToSeconds } from "&utils/schedule";
 
 const JobsList = () => {
   const navigate = useNavigate();
@@ -27,33 +30,66 @@ const JobsList = () => {
     query(collection(store, "jobs"), where("userId", "==", userId))
   );
 
-  const dataSource = result?.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as SearchJob[];
+  const dataSource = useMemo(
+    () =>
+      result?.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as SearchJob[],
+    [result]
+  );
 
   const columns: ColumnsType<SearchJob> = [
+    {
+      title: "Sources",
+      dataIndex: ["query", "sources"],
+      key: "query.sources",
+      render: (sources: dataSource[]) => (
+        <Space>
+          {sources?.map((source) => (
+            <Source key={source} source={source} />
+          ))}
+        </Space>
+      ),
+    },
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
       sorter: (a, b) => a.name.localeCompare(b.name),
+      render: (name) => <Typography.Text strong>{name}</Typography.Text>,
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
       sorter: (a, b) => a.description.localeCompare(b.description),
+      render: (description) => (
+        <Typography.Text type="secondary">{description}</Typography.Text>
+      ),
     },
     {
       title: "Schedule",
       dataIndex: "schedule",
       key: "schedule",
-      render: (schedule) => (
-        <span>
-          {schedule.interval} {schedule.unit}
-        </span>
+      sorter: (a, b) => {
+        const aSeconds = scheduleToSeconds(a.schedule);
+        const bSeconds = scheduleToSeconds(b.schedule);
+        return aSeconds - bSeconds;
+      },
+      render: ({ interval, unit }) => (
+        <Typography.Text code>
+          {interval} {unit}
+        </Typography.Text>
       ),
+    },
+    {
+      title: "Last Run",
+      dataIndex: "lastRunTime",
+      key: "lastRunTime",
+      render: (lastRunTime: Timestamp) => <DateTime timestamp={lastRunTime} />,
+      sorter: (a, b) =>
+        Number(a.lastRunTime?.toMillis()) - Number(b.lastRunTime?.toMillis()),
     },
     {
       title: "Status",
@@ -62,24 +98,6 @@ const JobsList = () => {
       render: (status: jobStatus) => (
         <Tag color={StatusColors[status]}>{status}</Tag>
       ),
-    },
-    {
-      title: "Last Run Time",
-      dataIndex: "lastRunTime",
-      key: "lastRunTime",
-      render: (lastRunTime: Timestamp) =>
-        lastRunTime?.toDate().toLocaleString() || "-",
-      sorter: (a, b) =>
-        Number(a.lastRunTime?.toMillis()) - Number(b.lastRunTime?.toMillis()),
-    },
-    {
-      title: "Next Run Time",
-      dataIndex: "nextRunTime",
-      key: "nextRunTime",
-      render: (nextRunTime: Timestamp) =>
-        nextRunTime?.toDate().toLocaleString() || "-",
-      sorter: (a, b) =>
-        Number(a.nextRunTime?.toMillis()) - Number(b.nextRunTime?.toMillis()),
     },
     {
       render: (_, { id, status }) =>
@@ -98,7 +116,7 @@ const JobsList = () => {
       <PageHeader
         title="Jobs"
         extra={[
-          <Button key="new-job" type="primary" onClick={goToNewJob}>
+          <Button key="1" type="primary" onClick={goToNewJob}>
             New Job
           </Button>,
         ]}
@@ -109,6 +127,7 @@ const JobsList = () => {
         columns={columns}
         loading={loading}
         rowKey={"id"}
+        pagination={{ pageSize: 10 }}
         onRow={(record) => ({
           onClick: () => navigate(generatePath(Paths.Job, { id: record.id! })),
         })}

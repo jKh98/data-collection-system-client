@@ -13,7 +13,7 @@ import Job from "&pages/jobs/Job";
 import JobsList from "&pages/jobs/JobsList";
 import NewJob from "&pages/jobs/NewJob";
 import { Login } from "&pages/login/Login";
-import Results from "&pages/results/Results";
+import Results from "&pages/results/ResultsList";
 
 function App() {
   notification.config({ maxCount: 1, duration: 3 });
@@ -51,7 +51,6 @@ function App() {
         <Route path={Paths.Job} element={<Job />} />
         <Route path={Paths.JobEdit} element={<EditJob />} />
         <Route path={Paths.JobNew} element={<NewJob />} />
-        <Route path={Paths.Results} element={<Results />} />
       </Route>
       <Route path={"*"} element={<Navigate to={Paths.Jobs} />} />
     </Routes>

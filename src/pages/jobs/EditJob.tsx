@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocument } from "react-firebase-hooks/firestore";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { message, Result } from "antd";
 import { doc, setDoc, Timestamp } from "firebase/firestore";
 
@@ -13,6 +13,7 @@ import { scheduleToSeconds } from "&utils/schedule";
 import { removeDeepEmpty } from "&utils/transform";
 
 const EditJob = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [user] = useAuthState(auth);
   const jobRef = doc(store, "jobs", id!);
@@ -31,7 +32,6 @@ const EditJob = () => {
   };
 
   const onSubmit = (values: typeof initialValues) => {
-    console.log(values);
     const updatedJob: SearchJob = {
       ...values,
       id: jobRef.id,
@@ -43,12 +43,14 @@ const EditJob = () => {
       ),
     };
 
-    console.log(removeDeepEmpty(updatedJob));
     setSubmitting(true);
     setDoc(jobRef, removeDeepEmpty(updatedJob))
       .then(() => message.success("Job updated successfully"))
       .catch((error) => message.error(error.message))
-      .finally(() => setSubmitting(false));
+      .finally(() => {
+        setSubmitting(false);
+        navigate(-1);
+      });
   };
 
   if (loading) {

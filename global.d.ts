@@ -68,15 +68,16 @@ declare global {
   type intervalUnit = "minutes" | "hours" | "days";
 
   interface SearchResult {
-    id: string;
+    id: string; //
     jobId?: string;
     source: dataSource;
     title: string;
+    desctiption?: string;
     content: string;
     url: string;
     publishedAt?: string;
     createdTime: Timestamp;
-    updatedTime?: Timestamp;
+    updatedTime: Timestamp;
   }
 }
 
