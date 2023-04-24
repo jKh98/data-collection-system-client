@@ -27,7 +27,7 @@ export const jobScheduler = functions
 
     // Loop over documents and push job.
     jobDocs.forEach((snapshot) => {
-      const { query, schedule, id } = snapshot.data();
+      const { query, schedule, id, userId } = snapshot.data();
       // update status to running
       snapshot.ref.update({ status: "running" }).then(() => {
         query.sources.forEach((source: dataSource) => {
@@ -51,6 +51,8 @@ export const jobScheduler = functions
                       ...result,
                       createdTime: now,
                       updatedTime: now,
+                      jobId: id,
+                      userId,
                     });
                   }
                 });
