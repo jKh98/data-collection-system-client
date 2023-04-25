@@ -1,11 +1,13 @@
 import { Fragment } from "react";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { Navigate, useParams } from "react-router-dom";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import { Alert, Card, Col, Divider, Result, Row, Tag, Typography } from "antd";
 import { doc } from "firebase/firestore";
 
 import JobActions from "./JobActions";
 
+import DataRow from "&components/DataRow";
 import DataSource from "&components/DataSource";
 import DateTime from "&components/DateTime";
 import { PageHeader } from "&components/Page";
@@ -44,16 +46,19 @@ const Job = () => {
     );
   }
 
-  const { status } = job;
+  const {
+    status,
+    name,
+    description,
+    createdTime,
+    lastUpdatedTime,
+    query,
+    schedule,
+    lastRunTime,
+    nextRunTime,
+  } = job || {};
 
-  const DataRow = ({ title, value }: { title: string; value: any }) => (
-    <Row style={{ marginBottom: 12 }}>
-      <Col span={8}>
-        <Text strong>{title}</Text>
-      </Col>
-      <Col span={16}>{value}</Col>
-    </Row>
-  );
+  const { interval, unit } = schedule || {};
 
   return (
     <Fragment>
@@ -74,54 +79,52 @@ const Job = () => {
           </Fragment>
         }
         withBack
-        extra={[<JobActions id={id} status={status} />]}
+        extra={[<JobActions key="1" id={id} status={status} />]}
       />
 
       <Row gutter={16}>
         <Col xs={24} sm={24} md={8} lg={8} xl={8}>
           <Card title="Job Details">
-            <DataRow
-              title="Name"
-              value={<Text type="secondary">{job.name}</Text>}
-            />
-            <DataRow
-              title="Description"
-              value={<Text type="secondary">{job.description}</Text>}
-            />
+            <DataRow title="Name" value={<Text>{name}</Text>} />
+            <DataRow title="Description" value={<Text>{description}</Text>} />
             <Divider />
             <DataRow
               title="Created"
-              value={<DateTime timestamp={job.createdTime} />}
+              value={<DateTime timestamp={createdTime} />}
             />
             <DataRow
               title="Updated"
-              value={<DateTime timestamp={job.lastUpdatedTime!} />}
+              value={<DateTime timestamp={lastUpdatedTime!} />}
             />
             <Divider />
             <DataRow
               title="Schedule"
               value={
                 <Text code>
-                  {job.schedule.interval} {job.schedule.unit}
+                  {interval} {unit}
                 </Text>
               }
             />
             <DataRow
               title="Last Run"
-              value={<DateTime timestamp={job.lastRunTime!} />}
+              value={<DateTime timestamp={lastRunTime!} />}
             />
             <DataRow
               title="Next Run"
-              value={<DateTime timestamp={job.nextRunTime!} />}
+              value={<DateTime timestamp={nextRunTime!} />}
             />
             <Divider />
             <DataRow
               title="Sources"
-              value={job.query?.sources?.map((source, i) => (
+              value={query?.sources?.map((source, i) => (
                 <DataSource key={i} source={source} />
               ))}
             />
-            <Alert message="Check the edit page for more details on advanced queries." />
+            <Alert
+              icon={<InfoCircleOutlined />}
+              type="info"
+              message="Check the edit page for more details on advanced queries."
+            />
           </Card>
         </Col>
         <Col xs={24} sm={24} md={16} lg={16} xl={16}>

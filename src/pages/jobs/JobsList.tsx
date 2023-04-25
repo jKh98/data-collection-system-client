@@ -1,8 +1,9 @@
-import React, { useMemo } from "react";
+import React, { Fragment, useMemo } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { generatePath, useNavigate } from "react-router-dom";
 import { Button, Result, Space, Table, Tag, Typography } from "antd";
+import Search from "antd/es/input/Search";
 import { ColumnsType } from "antd/es/table";
 import { collection, query, Timestamp, where } from "firebase/firestore";
 
@@ -20,6 +21,7 @@ const JobsList = () => {
   const navigate = useNavigate();
   const [user] = useAuthState(auth);
   const userId = user?.uid;
+  const [search, setSearch] = React.useState<string>("");
 
   /**
    * Get all jobs for the current user
@@ -32,11 +34,18 @@ const JobsList = () => {
 
   const dataSource = useMemo(
     () =>
-      result?.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as SearchJob[],
-    [result]
+      result?.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() } as SearchJob))
+        .filter(({ id, name, description }) => {
+          const searchQuery = search.toLowerCase();
+          return (
+            id?.toLowerCase().includes(searchQuery) ||
+            name.toLowerCase().includes(searchQuery) ||
+            description.toLowerCase().includes(searchQuery)
+          );
+        }) as SearchJob[],
+
+    [result, search]
   );
 
   const columns: ColumnsType<SearchJob> = [
@@ -107,12 +116,16 @@ const JobsList = () => {
 
   const goToNewJob = () => navigate(Paths.JobNew);
 
+  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+
   if (error) {
     return <Result status="error" title="Error" subTitle={error?.message} />;
   }
 
   return (
-    <div>
+    <Fragment>
       <PageHeader
         title="Jobs"
         extra={[
@@ -122,17 +135,24 @@ const JobsList = () => {
         ]}
       />
 
+      <Search
+        placeholder="Search by id, name, or description"
+        onChange={onSearch}
+        style={{ marginBottom: 16 }}
+      />
+
       <Table
         dataSource={dataSource}
         columns={columns}
         loading={loading}
         rowKey={"id"}
         pagination={{ pageSize: 10 }}
+        key={"id"}
         onRow={(record) => ({
           onClick: () => navigate(generatePath(Paths.Job, { id: record.id! })),
         })}
       />
-    </div>
+    </Fragment>
   );
 };
 

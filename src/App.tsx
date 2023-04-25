@@ -8,12 +8,14 @@ import ProtectedRoute from "&components/ProtectedRoute";
 import Splash from "&components/Splash";
 import { auth } from "&config/firebase";
 import { Paths } from "&constants/paths";
+import { Account } from "&pages/auth/Account";
+import { Login } from "&pages/auth/Login";
+import { ResetPassword } from "&pages/auth/ResetPassword";
 import EditJob from "&pages/jobs/EditJob";
 import Job from "&pages/jobs/Job";
 import JobsList from "&pages/jobs/JobsList";
 import NewJob from "&pages/jobs/NewJob";
-import { Login } from "&pages/login/Login";
-import Results from "&pages/results/ResultsList";
+import Result from "&pages/results/Result";
 
 function App() {
   notification.config({ maxCount: 1, duration: 3 });
@@ -33,7 +35,9 @@ function App() {
         }
       >
         <Route path={Paths.LogIn} element={<Login />} />
+        <Route path={Paths.ResetPassword} element={<ResetPassword />} />
       </Route>
+
       <Route
         element={
           <Layout>
@@ -51,6 +55,8 @@ function App() {
         <Route path={Paths.Job} element={<Job />} />
         <Route path={Paths.JobEdit} element={<EditJob />} />
         <Route path={Paths.JobNew} element={<NewJob />} />
+        <Route path={Paths.Result} element={<Result />} />
+        <Route path={Paths.Account} element={<Account />} />
       </Route>
       <Route path={"*"} element={<Navigate to={Paths.Jobs} />} />
     </Routes>
