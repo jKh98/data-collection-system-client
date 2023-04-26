@@ -44,7 +44,7 @@ export const Header = () => {
   };
 
   return (
-    <Layout.Header>
+    <Layout.Header style={{ padding: "0 36px" }}>
       <Typography.Link
         style={{
           color: "white",

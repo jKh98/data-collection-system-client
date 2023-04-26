@@ -2,10 +2,12 @@ import React, { Fragment, useMemo } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { useNavigate } from "react-router-dom";
-import { Result, Typography } from "antd";
+import { Card, Result, Typography } from "antd";
 import Search from "antd/es/input/Search";
 import Table, { ColumnsType } from "antd/es/table";
 import { collection, query, Timestamp, where } from "firebase/firestore";
+
+import ResultsKpis from "./ResultsKpis";
 
 import DataSource from "&components/DataSource";
 import DateTime from "&components/DateTime";
@@ -36,11 +38,6 @@ const ResultsList = ({ jobId }: ResultsProps) => {
 
   const dataSource = useMemo(
     () =>
-      // result?.docs.map((doc) => ({
-      //   id: doc.id,
-      //   ...doc.data(),
-      // })) as SearchResult[],
-
       result?.docs
         .map((doc) => ({ id: doc.id, ...doc.data() } as SearchResult))
         .filter(({ id, title, content, description }) => {
@@ -76,10 +73,7 @@ const ResultsList = ({ jobId }: ResultsProps) => {
       title: "Retrieved At",
       dataIndex: "updatedTime",
       key: "updatedTime",
-      width: 150,
-      render: (updatedTime: Timestamp) => (
-        <DateTime direction="vertical" timestamp={updatedTime} />
-      ),
+      render: (updatedTime: Timestamp) => <DateTime timestamp={updatedTime} />,
       sorter: (a, b) =>
         Number(a.updatedTime?.toMillis()) - Number(b.updatedTime?.toMillis()),
     },
@@ -95,22 +89,25 @@ const ResultsList = ({ jobId }: ResultsProps) => {
 
   return (
     <Fragment>
-      <Search
-        placeholder="Search by id, name, description, or content"
-        onChange={onSearch}
-        style={{ marginBottom: 16 }}
-      />
-      <Table
-        size="small"
-        columns={columns}
-        dataSource={dataSource}
-        loading={loading}
-        pagination={{ pageSize: 5 }}
-        key={"id"}
-        onRow={(record) => ({
-          onClick: () => navigate(`/results/${record.id}`),
-        })}
-      />
+      <ResultsKpis results={dataSource} loading={loading} />
+      <Card>
+        <Search
+          placeholder="Search by id, name, description, or content"
+          onChange={onSearch}
+          style={{ marginBottom: 16 }}
+        />
+        <Table
+          size="small"
+          columns={columns}
+          dataSource={dataSource}
+          loading={loading}
+          pagination={{ pageSize: 8 }}
+          key={"id"}
+          onRow={(record) => ({
+            onClick: () => navigate(`/results/${record.id}`),
+          })}
+        />
+      </Card>
     </Fragment>
   );
 };

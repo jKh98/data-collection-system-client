@@ -22,6 +22,7 @@ import TwitterApiForm from "./TwitterApiForm";
 
 import { PageHeader } from "&components/Page";
 import { Paths } from "&constants/paths";
+import { scheduleToSeconds } from "&utils/schedule";
 
 interface JobFormProps {
   onSubmit: (values: SearchJob) => void;
@@ -89,6 +90,24 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
                     rules={[
                       { required: true, message: "Interval is required" },
                       { type: "number", min: 0 },
+                      {
+                        validator: (_, interval) => {
+                          const unit = form.getFieldValue(["schedule", "unit"]);
+                          const secs = scheduleToSeconds({ unit, interval });
+
+                          if (secs < 5 * 60) {
+                            return Promise.reject(
+                              "Interval should be at least 5 minutes"
+                            );
+                          }
+
+                          if (secs > 7 * 24 * 60 * 60) {
+                            return Promise.reject(
+                              "Interval should be less than 7 days"
+                            );
+                          }
+                        },
+                      },
                     ]}
                   >
                     <InputNumber min={0} />

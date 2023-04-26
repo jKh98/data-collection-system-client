@@ -1,8 +1,8 @@
 export const StatusColors: {
   [K in jobStatus]: string;
 } = {
-  running: "blue",
-  active: "green",
-  stopped: "orange",
-  failed: "red",
+  running: "processing",
+  active: "success",
+  stopped: "warning",
+  failed: "error",
 };

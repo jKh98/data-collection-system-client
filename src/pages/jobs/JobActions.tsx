@@ -15,9 +15,11 @@ import { Paths } from "&constants/paths";
 interface JobActionsProps {
   id: string;
   status: jobStatus;
+  size?: "small" | "middle" | "large";
+  type?: "primary" | "ghost" | "dashed" | "link" | "text";
 }
 
-const JobActions = ({ id, status }: JobActionsProps) => {
+const JobActions = ({ id, status, size, type }: JobActionsProps) => {
   const navigate = useNavigate();
 
   const [isLoading, setLoading] = React.useState(false);
@@ -68,6 +70,8 @@ const JobActions = ({ id, status }: JobActionsProps) => {
   return (
     <Dropdown menu={menuProps}>
       <Button
+        size={size}
+        type={type}
         loading={isLoading}
         onClick={(e) => {
           e.preventDefault();

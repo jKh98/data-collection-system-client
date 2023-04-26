@@ -5,7 +5,7 @@ export const Content: FC<PropsWithChildren<{}>> = (props) => {
   return (
     <Layout.Content
       style={{
-        padding: "24px",
+        padding: "24px 36px",
         height: "calc(100vh - 64px)",
         overflow: "auto",
       }}

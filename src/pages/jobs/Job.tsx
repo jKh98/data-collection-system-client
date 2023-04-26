@@ -14,6 +14,7 @@ import { PageHeader } from "&components/Page";
 import Splash from "&components/Splash";
 import { store } from "&config/firebase";
 import { StatusColors } from "&constants/colors";
+import { StatusIcons } from "&constants/icons";
 import { Paths } from "&constants/paths";
 import ResultsList from "&pages/results/ResultsList";
 
@@ -63,20 +64,11 @@ const Job = () => {
   return (
     <Fragment>
       <PageHeader
-        title={
-          <Fragment>
-            Job: {id}
-            <Divider type="vertical" />
-            <Tag
-              color={StatusColors[status]}
-              style={{
-                verticalAlign: "middle",
-                transform: "scale(1.2)",
-              }}
-            >
-              {status}
-            </Tag>
-          </Fragment>
+        title={`Job: ${id}`}
+        titleExtra={
+          <Tag icon={StatusIcons[status]} color={StatusColors[status]}>
+            {status}
+          </Tag>
         }
         withBack
         extra={[<JobActions key="1" id={id} status={status} />]}
@@ -128,9 +120,7 @@ const Job = () => {
           </Card>
         </Col>
         <Col xs={24} sm={24} md={16} lg={16} xl={16}>
-          <Card title="Results">
-            <ResultsList jobId={id} />
-          </Card>
+          <ResultsList jobId={id} />
         </Col>
       </Row>
     </Fragment>

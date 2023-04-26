@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { useToken } from "react-firebase-hooks/messaging";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Layout, message, notification } from "antd";
+import { collection, doc, setDoc } from "firebase/firestore";
+import { onMessage } from "firebase/messaging";
 
 import { Content, Header } from "&components/Layout";
 import ProtectedRoute from "&components/ProtectedRoute";
 import Splash from "&components/Splash";
-import { auth } from "&config/firebase";
+import { auth, messaging, store } from "&config/firebase";
 import { Paths } from "&constants/paths";
 import { Account } from "&pages/auth/Account";
 import { Login } from "&pages/auth/Login";
@@ -18,10 +21,33 @@ import NewJob from "&pages/jobs/NewJob";
 import Result from "&pages/results/Result";
 
 function App() {
+  const [token] = useToken(messaging, process.env.REACT_APP_FIREBASE_VAPID_KEY);
+
+  console.log("Token: ", token);
   notification.config({ maxCount: 1, duration: 3 });
 
   const [user, loading, error] = useAuthState(auth);
+  const userId = user?.uid;
   const isAuthenticated = !!user;
+
+  useEffect(() => {
+    // save token to firestore under user
+    if (userId && token) {
+      const userRef = doc(store, "users", userId);
+      setDoc(userRef, { fcmToken: token }, { merge: true }).then(() => {
+        console.log("Token saved to firestore");
+      });
+    }
+  }, [userId, token]);
+
+  // Firebase messaging
+  onMessage(messaging, (payload) => {
+    console.log("Message received. ", payload);
+    notification.info({
+      message: payload.notification?.title,
+      description: payload.notification?.body,
+    });
+  });
 
   if (error) message.error(error.message);
 

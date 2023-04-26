@@ -4,10 +4,9 @@ import { Timestamp } from "firebase/firestore";
 
 interface DateTimeProps {
   timestamp: Timestamp;
-  direction?: "vertical" | "horizontal";
 }
 
-const DateTime = ({ timestamp, direction = "horizontal" }: DateTimeProps) => {
+const DateTime = ({ timestamp }: DateTimeProps) => {
   const dateTimeString = timestamp?.toDate()?.toLocaleString();
 
   if (!dateTimeString) {
@@ -17,9 +16,13 @@ const DateTime = ({ timestamp, direction = "horizontal" }: DateTimeProps) => {
   const [date, time] = dateTimeString.split(",");
 
   return (
-    <Space direction={direction}>
-      <Typography.Text code>{date}</Typography.Text>
-      <Typography.Text code>{time}</Typography.Text>
+    <Space size="small">
+      <Typography.Text style={{ whiteSpace: "nowrap" }} code>
+        {date}
+      </Typography.Text>
+      <Typography.Text style={{ whiteSpace: "nowrap" }} code>
+        {time}
+      </Typography.Text>
     </Space>
   );
 };

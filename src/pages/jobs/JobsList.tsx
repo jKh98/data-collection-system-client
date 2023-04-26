@@ -8,12 +8,14 @@ import { ColumnsType } from "antd/es/table";
 import { collection, query, Timestamp, where } from "firebase/firestore";
 
 import JobActions from "./JobActions";
+import JobsKpis from "./JobsKpis";
 
 import Source from "&components/DataSource";
 import DateTime from "&components/DateTime";
 import { PageHeader } from "&components/Page";
 import { auth, store } from "&config/firebase";
 import { StatusColors } from "&constants/colors";
+import { StatusIcons } from "&constants/icons";
 import { Paths } from "&constants/paths";
 import { scheduleToSeconds } from "&utils/schedule";
 
@@ -105,12 +107,14 @@ const JobsList = () => {
       dataIndex: "status",
       key: "status",
       render: (status: jobStatus) => (
-        <Tag color={StatusColors[status]}>{status}</Tag>
+        <Tag icon={StatusIcons[status]} color={StatusColors[status]}>
+          {status}
+        </Tag>
       ),
     },
     {
       render: (_, { id, status }) =>
-        id && <JobActions id={id} status={status} />,
+        id && <JobActions size="small" id={id} status={status} />,
     },
   ];
 
@@ -134,6 +138,8 @@ const JobsList = () => {
           </Button>,
         ]}
       />
+
+      <JobsKpis jobs={dataSource} loading={loading} />
 
       <Search
         placeholder="Search by id, name, or description"

@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { Navigate, useParams } from "react-router-dom";
 import {
+  Button,
   Card,
   Col,
   Divider,
@@ -11,6 +12,8 @@ import {
   Typography,
 } from "antd";
 import { doc } from "firebase/firestore";
+
+import ResultsKpis from "./ResultsKpis";
 
 import DataRow from "&components/DataRow";
 import DataSource from "&components/DataSource";
@@ -56,6 +59,7 @@ const Result = () => {
     content,
     url,
     imageUrl,
+    pdfUrl,
     publishedAt,
     createdTime,
     updatedTime,
@@ -64,19 +68,9 @@ const Result = () => {
   return (
     <Fragment>
       <PageHeader
-        title={
-          <Fragment>
-            Result: {id}
-            <Divider type="vertical" />
-            <DataSource source={source} size={30} />
-          </Fragment>
-        }
+        title={`Result: ${id}`}
+        titleExtra={<DataSource source={source} size={30} />}
         withBack
-        extra={
-          [
-            /* <JobActions job={job} /> */
-          ]
-        }
       />
 
       <Row gutter={16}>
@@ -111,17 +105,19 @@ const Result = () => {
               value={<DateTime timestamp={updatedTime} />}
             />
           </Card>
+          {pdfUrl && (
+            <Button
+              type="primary"
+              href={pdfUrl}
+              target="_blank"
+              style={{ marginTop: 16, width: "100%" }}
+            >
+              Download PDF
+            </Button>
+          )}
         </Col>
         <Col xs={24} sm={24} md={16} lg={16} xl={16}>
-          <Card
-            cover={
-              <Image
-                alt=""
-                src={imageUrl}
-                style={{ width: "100%", height: "auto" }}
-              />
-            }
-          >
+          <Card cover={<Image alt="" src={imageUrl} sizes="100%" />}>
             <Text>
               <div dangerouslySetInnerHTML={{ __html: content }} />
             </Text>
