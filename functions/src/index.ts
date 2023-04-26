@@ -5,7 +5,7 @@ import * as os from "os";
 import * as path from "path";
 import * as puppeteer from "puppeteer";
 
-import { checkResultChanged, scheduleToSeconds } from "./utils";
+import { checkResultChanged, scheduleToSeconds, sourceToLabel } from "./utils";
 import { workers } from "./workers";
 
 type snapshotType =
@@ -14,6 +14,7 @@ type snapshotType =
 interface BuildLocalJobArgs {
   id: string;
   userId: string;
+  fcmToken: string;
   source: dataSource;
   query: SearchQuery;
 }
@@ -102,9 +103,20 @@ export async function urlToPdf(resultId: string, url: string, jobId: string) {
   }
 }
 
+const getUserFcmToken = async (userId: string) => {
+  const userRef = db.collection("users").doc(userId);
+  const userDoc = await userRef.get();
+  const fcmToken = userDoc.data()?.fcmToken;
+
+  return fcmToken;
+};
+
 export const buildLocalJob = async (args: BuildLocalJobArgs) => {
-  const { id, userId, source, query } = args;
+  const { id, userId, source, query, fcmToken } = args;
+
   try {
+    let added = 0,
+      updated = 0;
     const results = await workers[source](query);
     await Promise.all(
       results.map(async (result) => {
@@ -125,6 +137,7 @@ export const buildLocalJob = async (args: BuildLocalJobArgs) => {
           // update result
           const obj = { ...result, updatedTime: now, pdfUrl };
           await resultRef.update(obj);
+          updated++;
         } else if (shouldAdd) {
           // create result
           const obj = {
@@ -137,11 +150,30 @@ export const buildLocalJob = async (args: BuildLocalJobArgs) => {
           };
 
           await resultRef.set(obj);
+          added++;
         }
       })
     );
+
+    if ((added || updated) && fcmToken) {
+      const title = `New results for job ${id}`;
+      const finalSource = sourceToLabel(source);
+      const body = `Added ${added} new results and updated ${updated} results from ${finalSource}`;
+      const type = "info";
+      const message = {
+        notification: { title, body },
+        data: { type },
+        token: fcmToken,
+      };
+
+      await admin.messaging().send(message);
+    }
+
+    return { added, updated };
   } catch (e) {
     console.error(`Error in ${source} job for job ${id}: ${e}`);
+
+    return { added: 0, updated: 0 };
   } finally {
     console.log(`Finished ${source} job for job ${id}`);
   }
@@ -150,21 +182,58 @@ export const buildLocalJob = async (args: BuildLocalJobArgs) => {
 export const buildJob = async (args: BuildJobArgs) => {
   const { snapshot, jobStart } = args;
   const { id, userId, schedule, query } = snapshot.data() as SearchJob;
+  const fcmToken = await getUserFcmToken(userId);
 
   try {
     // update status to running
     await snapshot.ref.update({ status: "running" });
 
     // Execute all local jobs concurrently
-    await Promise.all(
+    const results = await Promise.all(
       query.sources.map(
         async (source: dataSource) =>
-          await buildLocalJob({ id: id!, userId, source, query })
+          await buildLocalJob({ id: id!, userId, source, query, fcmToken })
       )
     );
+
+    const didAddOrUpdate = results.reduce(
+      (acc, curr) => {
+        return {
+          added: acc.added + curr.added,
+          updated: acc.updated + curr.updated,
+        };
+      },
+      { added: 0, updated: 0 }
+    );
+
+    if (fcmToken) {
+      const title = `Finished job ${id}`;
+      const body = `Added ${didAddOrUpdate.added} new results and updated ${didAddOrUpdate.updated} results`;
+      const type = "success";
+      const message = {
+        notification: { title, body },
+        data: { type },
+        token: fcmToken,
+      };
+
+      await admin.messaging().send(message);
+    }
   } catch (error) {
     console.error(`Error in job ${snapshot.id}: ${error}`);
-    snapshot.ref.update({ status: "failed" });
+    await snapshot.ref.update({ status: "failed" });
+
+    if (fcmToken) {
+      const title = `Error in job ${id}`;
+      const body = `Job failed with error: ${error}`;
+      const type = "error";
+      const message = {
+        notification: { title, body },
+        data: { type },
+        token: fcmToken,
+      };
+
+      await admin.messaging().send(message);
+    }
   } finally {
     // update status then next run time
     const nextRunTime = admin.firestore.Timestamp.fromDate(

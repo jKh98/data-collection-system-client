@@ -3,7 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useToken } from "react-firebase-hooks/messaging";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Layout, message, notification } from "antd";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { onMessage } from "firebase/messaging";
 
 import { Content, Header } from "&components/Layout";
@@ -22,9 +22,7 @@ import Result from "&pages/results/Result";
 
 function App() {
   const [token] = useToken(messaging, process.env.REACT_APP_FIREBASE_VAPID_KEY);
-
-  console.log("Token: ", token);
-  notification.config({ maxCount: 1, duration: 3 });
+  notification.config({ duration: 3, placement: "bottomRight" });
 
   const [user, loading, error] = useAuthState(auth);
   const userId = user?.uid;
@@ -40,12 +38,18 @@ function App() {
     }
   }, [userId, token]);
 
+  notification.open({
+    message: "Welcome to JobHunt!",
+    type: "info",
+  });
+
   // Firebase messaging
   onMessage(messaging, (payload) => {
     console.log("Message received. ", payload);
     notification.info({
       message: payload.notification?.title,
       description: payload.notification?.body,
+      type: payload.data?.type as any,
     });
   });
 

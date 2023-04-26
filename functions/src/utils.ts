@@ -41,3 +41,16 @@ export const checkResultChanged = (
 
 export const idToHash = (id: string) =>
   createHash("md5").update(id).digest("hex");
+
+export const sourceToLabel = (source: dataSource) => {
+  switch (source) {
+    case "newsApi":
+      return "Google News";
+    case "twitterApi":
+      return "Twitter";
+    case "redditApi":
+      return "Reddit";
+    default:
+      return source;
+  }
+};
