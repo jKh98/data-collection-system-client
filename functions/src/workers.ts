@@ -57,8 +57,10 @@ async function searchTwitterApi(query: SearchQuery): Promise<SearchResult[]> {
 
   const twitterApiEndpoint = "https://api.twitter.com/1.1/search/tweets.json";
 
+  const utf8_urlEncoded_q = encodeURIComponent(twitterApiQuery ?? q);
+
   const params = new URLSearchParams();
-  params.append("q", twitterApiQuery ?? q);
+  params.append("q", utf8_urlEncoded_q);
   params.append("count", (count ?? 100).toString());
   params.append("result_type", result_type ?? "recent");
   params.append("until", until ?? "");
@@ -69,9 +71,7 @@ async function searchTwitterApi(query: SearchQuery): Promise<SearchResult[]> {
   console.log(auth({ method: "GET", url: `${twitterApiEndpoint}?${params}` }));
 
   const response = await axios.get(finalUrl, {
-    headers: {
-      Authorization: auth({ method: "GET", url: finalUrl }),
-    },
+    headers: { Authorization: auth({ method: "GET", url: finalUrl }) },
   });
 
   const tweets = response.data.statuses;
@@ -81,9 +81,15 @@ async function searchTwitterApi(query: SearchQuery): Promise<SearchResult[]> {
       ({
         id: idToHash(tweet.id_str),
         source: "twitterApi",
-        title: tweet.full_text,
-        description: tweet.full_text,
-        content: tweet.full_text,
+        title: `Tweet by ${tweet.user.name} (@${tweet.user.screen_name})`,
+        description: `User description: ${tweet.user.description}\nHashtags: ${
+          tweet.entities.hashtags
+        }\nMentions: ${tweet.entities.user_mentions}\nSymbols: ${
+          tweet.entities.symbols
+        }\nURLs: ${Object.values(tweet.entities.urls).map(
+          (url: any) => url.url
+        )}`,
+        content: tweet.text,
         imageUrl: tweet?.entities?.media?.[0]?.media_url || null,
         url: `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,
         publishedAt: tweet.created_at,

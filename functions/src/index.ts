@@ -58,6 +58,11 @@ export async function urlToPdf(resultId: string, url: string, jobId: string) {
   try {
     if (!browser) return null;
 
+    // if browser has many pages open, wait until there are less than 10
+    while ((await browser.pages())?.length > 10) {
+      await new Promise((resolve) => setTimeout(resolve, Math.random() * 1000));
+    }
+
     const page = await browser.newPage();
 
     // Navigate to the URL.
@@ -249,7 +254,7 @@ export const buildJob = async (args: BuildJobArgs) => {
 };
 
 export const jobScheduler = functions
-  .runWith({ memory: "4GB", timeoutSeconds: 540 })
+  .runWith({ memory: "8GB", timeoutSeconds: 540 })
   .pubsub.schedule("* * * * *")
   .onRun(async (context) => {
     try {
