@@ -1,10 +1,36 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { DatePicker, Form, Input, Select } from "antd";
 import moment from "moment";
 
 import { LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP } from "&config/tooltips";
 
+type source = { id: string; name: string };
+
 const NewsApiForm = () => {
+  const [sources, setSources] = React.useState<Array<source>>([]);
+  const [isLoadingSources, setIsLoadingSources] = React.useState(false);
+
+  const {
+    REACT_APP_NEWS_API_SOURCES_URL: url,
+    REACT_APP_NEWS_API_KEY: apiKey,
+  } = process.env;
+
+  useEffect(() => {
+    const fetchSources = async () => {
+      setIsLoadingSources(true);
+      const response = await fetch(`${url}?apiKey=${apiKey}`);
+      const data = await response.json();
+      setSources(data.sources);
+      setIsLoadingSources(false);
+    };
+
+    fetchSources();
+
+    return () => {
+      setSources([]);
+    };
+  }, [url, apiKey]);
+
   return (
     <Fragment>
       <Form.Item
@@ -19,7 +45,13 @@ const NewsApiForm = () => {
         name={["query", "advancedQuery", "newsApi", "sources"]}
         label="Sources"
       >
-        <Select size="small" mode="tags" />
+        <Select size="small" mode="multiple" loading={isLoadingSources}>
+          {sources?.map((source) => (
+            <Select.Option key={source.id} value={source.id}>
+              {source.name}
+            </Select.Option>
+          ))}
+        </Select>
       </Form.Item>
 
       <Form.Item
