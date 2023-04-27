@@ -58,7 +58,7 @@ const ResultsList = ({ jobId }: ResultsProps) => {
       title: "Source",
       dataIndex: "source",
       key: "source",
-      width: 20,
+      width: 80,
       sorter: (a, b) => a.source.localeCompare(b.source),
       render: (source) => <DataSource source={source as dataSource} />,
     },
@@ -66,6 +66,7 @@ const ResultsList = ({ jobId }: ResultsProps) => {
       title: "Title",
       dataIndex: "title",
       key: "title",
+      ellipsis: { showTitle: true },
       sorter: (a, b) => a.title.localeCompare(b.title),
       render: (title) => <Typography.Text strong>{title}</Typography.Text>,
     },
@@ -73,6 +74,7 @@ const ResultsList = ({ jobId }: ResultsProps) => {
       title: "Retrieved At",
       dataIndex: "updatedTime",
       key: "updatedTime",
+      width: 200,
       render: (updatedTime: Timestamp) => <DateTime timestamp={updatedTime} />,
       sorter: (a, b) =>
         Number(a.updatedTime?.toMillis()) - Number(b.updatedTime?.toMillis()),
@@ -101,7 +103,7 @@ const ResultsList = ({ jobId }: ResultsProps) => {
           columns={columns}
           dataSource={dataSource}
           loading={loading}
-          pagination={{ pageSize: 8 }}
+          pagination={{ defaultPageSize: 10 }}
           rowKey={"id"}
           onRow={(record) => ({
             onClick: () => navigate(`/results/${record.id}`),

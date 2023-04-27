@@ -39,7 +39,7 @@ const RedditApiForm = () => {
         name={["query", "advancedQuery", "redditApi", "limit"]}
         label="Limit"
       >
-        <InputNumber size="small" />
+        <InputNumber size="small" min={1} max={100} />
       </Form.Item>
     </Fragment>
   );

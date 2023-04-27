@@ -152,7 +152,7 @@ const JobsList = () => {
         columns={columns}
         loading={loading}
         rowKey={"id"}
-        pagination={{ pageSize: 10 }}
+        pagination={{ defaultPageSize: 10 }}
         onRow={(record) => ({
           onClick: () => navigate(generatePath(Paths.Job, { id: record.id! })),
         })}
