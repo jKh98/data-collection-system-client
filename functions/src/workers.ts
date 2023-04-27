@@ -66,7 +66,7 @@ async function searchTwitterApi(query: SearchQuery): Promise<SearchResult[]> {
       Authorization: `Bearer ${twitterApiKey}`,
     },
     params: {
-      query: twitterApiQuery || q,
+      query: twitterApiQuery ?? q,
       max_results,
       expansions: expansions?.join(","),
       "tweet.fields": tweetFields?.join(","),
@@ -96,11 +96,11 @@ async function searchRedditApi(query: SearchQuery): Promise<SearchResult[]> {
   const { redditApi } = advancedQuery || {};
   const { q: redditApiQuery, subreddit, t, limit } = redditApi || {};
   const redditApiEndpoint = `https://www.reddit.com/r/${
-    subreddit || "all"
+    subreddit ?? "all"
   }/search.json`;
 
   const response = await axios.get(redditApiEndpoint, {
-    params: { q: redditApiQuery || q, t, limit },
+    params: { q: redditApiQuery ?? q, t, limit, raw_json: 1 },
   });
 
   const posts = response.data.data.children;
@@ -114,7 +114,7 @@ async function searchRedditApi(query: SearchQuery): Promise<SearchResult[]> {
         description: post.data.selftext,
         content: post.data.selftext_html || post.data.selftext,
         url: `https://www.reddit.com${post.data.permalink}`,
-        imageUrl: post.data.thumbnail,
+        imageUrl: post.data.preview?.images?.[0]?.source?.url || null,
         publishedAt: new Date(post.data.created_utc * 1000).toISOString(),
       } as SearchResult)
   );

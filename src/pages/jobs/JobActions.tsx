@@ -73,6 +73,7 @@ const JobActions = ({ id, status, size, type }: JobActionsProps) => {
         size={size}
         type={type}
         loading={isLoading}
+        disabled={isLoading}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();

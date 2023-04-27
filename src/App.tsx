@@ -38,11 +38,6 @@ function App() {
     }
   }, [userId, token]);
 
-  notification.open({
-    message: "Welcome to JobHunt!",
-    type: "info",
-  });
-
   // Firebase messaging
   onMessage(messaging, (payload) => {
     console.log("Message received. ", payload);

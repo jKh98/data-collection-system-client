@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { Navigate, useParams } from "react-router-dom";
 import {
+  Alert,
   Button,
   Card,
   Col,
@@ -12,8 +13,6 @@ import {
   Typography,
 } from "antd";
 import { doc } from "firebase/firestore";
-
-import ResultsKpis from "./ResultsKpis";
 
 import DataRow from "&components/DataRow";
 import DataSource from "&components/DataSource";
@@ -117,10 +116,16 @@ const Result = () => {
           )}
         </Col>
         <Col xs={24} sm={24} md={16} lg={16} xl={16}>
-          <Card cover={<Image alt="" src={imageUrl} sizes="100%" />}>
-            <Text>
-              <div dangerouslySetInnerHTML={{ __html: content }} />
-            </Text>
+          <Card
+            cover={imageUrl && <Image alt="" src={imageUrl} sizes="100%" />}
+          >
+            {content ? (
+              <Text>
+                <div dangerouslySetInnerHTML={{ __html: content }} />
+              </Text>
+            ) : (
+              <Alert message="No text content available" type="warning" />
+            )}
           </Card>
         </Col>
       </Row>

@@ -102,7 +102,7 @@ const ResultsList = ({ jobId }: ResultsProps) => {
           dataSource={dataSource}
           loading={loading}
           pagination={{ pageSize: 8 }}
-          key={"id"}
+          rowKey={"id"}
           onRow={(record) => ({
             onClick: () => navigate(`/results/${record.id}`),
           })}
