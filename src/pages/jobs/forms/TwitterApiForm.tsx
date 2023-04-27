@@ -1,11 +1,14 @@
 import React, { Fragment } from "react";
 import { Form, Input, InputNumber, Select } from "antd";
 
+import { TWITTER_QUERY_SYNTAX_QUERY_TOOLTIP } from "&config/tooltips";
+
 const TwitterApiForm = () => {
   return (
     <Fragment>
       <Form.Item
         name={["query", "advancedQuery", "twitterApi", "query"]}
+        tooltip={TWITTER_QUERY_SYNTAX_QUERY_TOOLTIP}
         label="Query"
       >
         <Input size="small" />

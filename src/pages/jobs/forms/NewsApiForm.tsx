@@ -2,11 +2,14 @@ import React, { Fragment } from "react";
 import { DatePicker, Form, Input, Select } from "antd";
 import moment from "moment";
 
+import { LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP } from "&config/tooltips";
+
 const NewsApiForm = () => {
   return (
     <Fragment>
       <Form.Item
         name={["query", "advancedQuery", "newsApi", "q"]}
+        tooltip={LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP}
         label="Query"
       >
         <Input size="small" />

@@ -18,6 +18,9 @@ const ResultsKpis = ({ results, loading }: ResultsKpisProps) => {
   const twitter = getTotalResultsBySource("twitterApi");
   const reddit = getTotalResultsBySource("redditApi");
 
+  const getPercentage = (value: number, total: number) =>
+    (total ? (value / total) * 100 : 0).toFixed(2);
+
   const kpis: Array<StatisticProps> = [
     {
       title: "Total Results",
@@ -25,20 +28,20 @@ const ResultsKpis = ({ results, loading }: ResultsKpisProps) => {
     },
     {
       title: "From Google",
-      value: google,
-      suffix: total ? `/${total}` : "",
+      value: getPercentage(google, total),
+      suffix: total ? `%` : "",
       prefix: <DataSource source="newsApi" />,
     },
     {
       title: "From Twitter",
-      value: twitter,
-      suffix: total ? `/${total}` : "",
+      value: getPercentage(twitter, total),
+      suffix: total ? `%` : "",
       prefix: <DataSource source="twitterApi" />,
     },
     {
       title: "From Reddit",
-      value: reddit,
-      suffix: total ? `/${total}` : "",
+      value: getPercentage(reddit, total),
+      suffix: total ? `%` : "",
       prefix: <DataSource source="redditApi" />,
     },
   ];

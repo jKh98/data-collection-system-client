@@ -21,6 +21,7 @@ import RedditApiForm from "./RedditApiForm";
 import TwitterApiForm from "./TwitterApiForm";
 
 import { PageHeader } from "&components/Page";
+import { LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP } from "&config/tooltips";
 import { Paths } from "&constants/paths";
 import { scheduleToSeconds } from "&utils/schedule";
 
@@ -106,6 +107,8 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
                               "Interval should be less than 7 days"
                             );
                           }
+
+                          return Promise.resolve();
                         },
                       },
                     ]}
@@ -145,6 +148,7 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
               <Form.Item
                 name={["query", "q"]}
                 label="Main Query"
+                tooltip={LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP}
                 rules={[{ required: true }]}
               >
                 <Input />

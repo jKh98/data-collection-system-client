@@ -1,11 +1,14 @@
 import React, { Fragment } from "react";
 import { Form, Input, InputNumber, Select } from "antd";
 
+import { LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP } from "&config/tooltips";
+
 const RedditApiForm = () => {
   return (
     <Fragment>
       <Form.Item
         name={["query", "advancedQuery", "redditApi", "q"]}
+        tooltip={LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP}
         label="Query"
       >
         <Input size="small" />
