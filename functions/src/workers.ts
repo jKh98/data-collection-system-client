@@ -1,9 +1,10 @@
 import axios from "axios";
+import { config } from "dotenv";
 
+import { auth } from "./auth";
 import { idToHash } from "./utils";
 
-const newsApiKey = "852022f50f004f49b38b2884089813a9";
-const twitterApiKey = "your_twitter_api_key";
+config();
 
 async function searchNewsApi(query: SearchQuery): Promise<SearchResult[]> {
   const { q, advancedQuery } = query;
@@ -28,7 +29,7 @@ async function searchNewsApi(query: SearchQuery): Promise<SearchResult[]> {
       from,
       to,
       language,
-      apiKey: newsApiKey,
+      apiKey: process.env.NEWS_API_KEY,
     },
   });
 
@@ -52,40 +53,39 @@ async function searchNewsApi(query: SearchQuery): Promise<SearchResult[]> {
 async function searchTwitterApi(query: SearchQuery): Promise<SearchResult[]> {
   const { q, advancedQuery } = query;
   const { twitterApi } = advancedQuery || {};
-  const {
-    query: twitterApiQuery,
-    max_results,
-    expansions,
-    "tweet.fields": tweetFields,
-    "user.fields": userFields,
-  } = twitterApi || {};
-  const twitterApiEndpoint = "https://api.twitter.com/2/tweets/search/recent";
+  const { q: twitterApiQuery, count, result_type, until } = twitterApi || {};
 
-  const response = await axios.get(twitterApiEndpoint, {
+  const twitterApiEndpoint = "https://api.twitter.com/1.1/search/tweets.json";
+
+  const params = new URLSearchParams();
+  params.append("q", twitterApiQuery ?? q);
+  params.append("count", (count ?? 100).toString());
+  params.append("result_type", result_type ?? "recent");
+  params.append("until", until ?? "");
+
+  const finalUrl = `${twitterApiEndpoint}?${params.toString()}`;
+
+  console.log(params.toString());
+  console.log(auth({ method: "GET", url: `${twitterApiEndpoint}?${params}` }));
+
+  const response = await axios.get(finalUrl, {
     headers: {
-      Authorization: `Bearer ${twitterApiKey}`,
-    },
-    params: {
-      query: twitterApiQuery ?? q,
-      max_results,
-      expansions: expansions?.join(","),
-      "tweet.fields": tweetFields?.join(","),
-      "user.fields": userFields?.join(","),
+      Authorization: auth({ method: "GET", url: finalUrl }),
     },
   });
 
-  const tweets = response.data.data;
+  const tweets = response.data.statuses;
 
   return tweets.map(
     (tweet: any) =>
       ({
-        id: idToHash(tweet.id),
+        id: idToHash(tweet.id_str),
         source: "twitterApi",
-        title: tweet.text,
-        description: tweet.text,
-        content: tweet.text,
-        imageUrl: tweet?.attachments?.media_keys[0] || null,
-        url: `https://twitter.com/${tweet.author_id}/status/${tweet.id}`,
+        title: tweet.full_text,
+        description: tweet.full_text,
+        content: tweet.full_text,
+        imageUrl: tweet?.entities?.media?.[0]?.media_url || null,
+        url: `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,
         publishedAt: tweet.created_at,
       } as SearchResult)
   );

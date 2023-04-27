@@ -38,11 +38,10 @@ declare global {
   }
 
   interface TwitterApiQuery {
-    query: string; // the search query term or phrase, overrides the q parameter in the main query
-    max_results?: number; // the maximum number of results to retrieve per page, up to 100
-    "tweet.fields"?: string[]; // an array of fields to include in the tweet objects, e.g. 'created_at'
-    expansions?: string[]; // an array of fields to expand in the tweet objects, e.g. 'author_id'
-    "user.fields"?: string[]; // an array of fields to include in the user objects, e.g. 'name'
+    q: string; // the search query term or phrase, overrides the q parameter in the main query
+    count?: number; // the maximum number of results to retrieve per page, up to 100result_type
+    result_type?: "mixed" | "recent" | "popular"; // the type of results to retrieve, e.g. 'recent
+    until?: string; // a date in the format 'yyyy-mm-dd' to retrieve tweets until
   }
 
   interface RedditApiQuery {
