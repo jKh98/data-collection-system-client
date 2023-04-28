@@ -28,26 +28,26 @@ const NewJob = () => {
 
   const onSubmit = (values: typeof initialValues) => {
     console.log({ values });
-    // const newJobRef = doc(collection(store, "jobs"));
-    // const newJob: SearchJob = {
-    //   ...values,
-    //   id: newJobRef.id,
-    //   userId: user!.uid,
-    //   status: "active",
-    //   createdTime: Timestamp.now(),
-    //   nextRunTime: Timestamp.fromDate(
-    //     new Date(Date.now() + scheduleToSeconds(values?.schedule!) * 1000)
-    //   ),
-    // };
+    const newJobRef = doc(collection(store, "jobs"));
+    const newJob: SearchJob = {
+      ...values,
+      id: newJobRef.id,
+      userId: user!.uid,
+      status: "active",
+      createdTime: Timestamp.now(),
+      nextRunTime: Timestamp.fromDate(
+        new Date(Date.now() + scheduleToSeconds(values?.schedule!) * 1000)
+      ),
+    };
 
-    // setSubmitting(true);
-    // setDoc(newJobRef, removeDeepEmpty(newJob))
-    //   .then(() => message.success("Job created successfully"))
-    //   .catch((error) => message.error(error.message))
-    //   .finally(() => {
-    //     setSubmitting(false);
-    //     navigate(Paths.Jobs);
-    //   });
+    setSubmitting(true);
+    setDoc(newJobRef, removeDeepEmpty(newJob))
+      .then(() => message.success("Job created successfully"))
+      .catch((error) => message.error(error.message))
+      .finally(() => {
+        setSubmitting(false);
+        navigate(Paths.Jobs);
+      });
   };
 
   return (
