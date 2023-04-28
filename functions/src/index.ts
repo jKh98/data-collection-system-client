@@ -28,7 +28,8 @@ admin.initializeApp();
 
 const db = admin.firestore();
 
-const PUPPETEER_TIMEOUT = 120000;
+const PUPPETEER_TIMEOUT = 60000;
+const MAX_BROWSER_PAGES = 20;
 
 // browser singleton
 let browser: puppeteer.Browser | null = null;
@@ -59,7 +60,7 @@ export async function urlToPdf(resultId: string, url: string, jobId: string) {
     if (!browser) return null;
 
     // if browser has many pages open, wait until there are less than 10
-    while ((await browser.pages())?.length > 10) {
+    while ((await browser.pages())?.length > MAX_BROWSER_PAGES) {
       await new Promise((resolve) => setTimeout(resolve, Math.random() * 1000));
     }
 
