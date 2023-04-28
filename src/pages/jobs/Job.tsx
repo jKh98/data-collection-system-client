@@ -59,7 +59,7 @@ const Job = () => {
     nextRunTime,
   } = job || {};
 
-  const { interval, unit } = schedule || {};
+  const { interval, unit, startTime, endTime } = schedule || {};
 
   return (
     <Fragment>
@@ -97,6 +97,15 @@ const Job = () => {
                 </Text>
               }
             />
+            <DataRow
+              title="Start Time"
+              value={<DateTime timestamp={startTime!} />}
+            />
+            <DataRow
+              title="End Time"
+              value={<DateTime timestamp={endTime!} />}
+            />
+            <Divider />
             <DataRow
               title="Last Run"
               value={<DateTime timestamp={lastRunTime!} />}

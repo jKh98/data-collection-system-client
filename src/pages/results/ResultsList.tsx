@@ -1,7 +1,7 @@
 import React, { Fragment, useMemo } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { useNavigate } from "react-router-dom";
+import { generatePath, useNavigate } from "react-router-dom";
 import { Card, Result, Typography } from "antd";
 import Search from "antd/es/input/Search";
 import Table, { ColumnsType } from "antd/es/table";
@@ -18,6 +18,7 @@ import ResultsKpis from "./ResultsKpis";
 import DataSource from "&components/DataSource";
 import DateTime from "&components/DateTime";
 import { auth, store } from "&config/firebase";
+import { Paths } from "&constants/paths";
 
 interface ResultsProps {
   jobId: string;
@@ -65,7 +66,13 @@ const ResultsList = ({ jobId }: ResultsProps) => {
       title: "Source",
       dataIndex: "source",
       key: "source",
-      width: 80,
+      width: 100,
+      filters: [
+        { text: "Google", value: "newsApi" },
+        { text: "Twitter", value: "twitterApi" },
+        { text: "Reddit", value: "redditApi" },
+      ],
+      onFilter: (value, record) => record.source === value,
       sorter: (a, b) => a.source.localeCompare(b.source),
       render: (source) => <DataSource source={source as dataSource} />,
     },
@@ -112,8 +119,9 @@ const ResultsList = ({ jobId }: ResultsProps) => {
           loading={loading}
           pagination={{ defaultPageSize: 10 }}
           rowKey={"id"}
-          onRow={(record) => ({
-            onClick: () => navigate(`/results/${record.id}`),
+          rowClassName={"clickable"}
+          onRow={({ id }) => ({
+            onClick: () => navigate(generatePath(Paths.Result, { id })),
           })}
         />
       </Card>

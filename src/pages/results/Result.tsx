@@ -78,7 +78,13 @@ const Result = () => {
             <DataRow title="Title" value={<Text>{title}</Text>} />
             <DataRow
               title="Description"
-              value={<Text>{description || "-"}</Text>}
+              value={
+                <Text>
+                  <div
+                    dangerouslySetInnerHTML={{ __html: description || "-" }}
+                  />
+                </Text>
+              }
             />
             <DataRow
               title="URL"

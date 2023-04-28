@@ -21,3 +21,8 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.clickable {
+  cursor: pointer;
+  user-select: none;
+}

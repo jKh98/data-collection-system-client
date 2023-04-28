@@ -156,8 +156,9 @@ const JobsList = () => {
         rowKey={"id"}
         scroll={{ x: true }}
         pagination={{ defaultPageSize: 10 }}
-        onRow={(record) => ({
-          onClick: () => navigate(generatePath(Paths.Job, { id: record.id! })),
+        rowClassName={"clickable"}
+        onRow={({ id }) => ({
+          onClick: () => navigate(generatePath(Paths.Job, { id: id! })),
         })}
       />
     </Fragment>
