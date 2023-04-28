@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 declare global {
   /**
    * A search job is triggered by a user to the backend system to start a scheduled search task
@@ -54,13 +56,19 @@ declare global {
   interface Schedule {
     interval: number; // The interval in seconds between each scheduled run
     unit: intervalUnit; // The unit of the interval
-    startTime?: string; // Optional start time for the schedule
-    endTime?: string; // Optional end time for the schedule
+    startTime?: Timestamp; // Optional start time for the schedule
+    endTime?: Timestamp; // Optional end time for the schedule
   }
 
   type dataSource = "newsApi" | "twitterApi" | "redditApi";
 
-  type jobStatus = "running" | "active" | "stopped" | "failed";
+  type jobStatus =
+    | "running"
+    | "active"
+    | "stopped"
+    | "failed"
+    | "finished"
+    | "scheduled";
 
   type intervalUnit = "minutes" | "hours" | "days";
 

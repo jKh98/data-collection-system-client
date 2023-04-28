@@ -1,8 +1,10 @@
 import React, { Fragment, useEffect } from "react";
-import { DatePicker, Form, Input, Select } from "antd";
+import { Form, Input, Select } from "antd";
 import moment from "moment";
 
+import DatePicker from "&components/DatePicker";
 import { LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP } from "&config/tooltips";
+import { simpleDateUtils } from "&utils/datePicker";
 
 type source = { id: string; name: string };
 
@@ -71,6 +73,9 @@ const NewsApiForm = () => {
       <Form.Item
         name={["query", "advancedQuery", "newsApi", "from"]}
         label="From"
+        dependencies={["query", "advancedQuery", "newsApi", "to"]}
+        getValueFromEvent={simpleDateUtils.getValueFromEvent}
+        getValueProps={simpleDateUtils.getValueProps}
         rules={[
           ({ getFieldValue }) => ({
             validator(_, value) {
@@ -81,8 +86,8 @@ const NewsApiForm = () => {
                 "to",
               ]);
 
-              if (!toValue) return Promise.resolve();
-              if (!value || value <= toValue) return Promise.resolve();
+              if (!toValue) return Promise.resolve(value);
+              if (!value || value <= toValue) return Promise.resolve(value);
 
               return Promise.reject(
                 new Error("From date should be before to date")
@@ -102,6 +107,9 @@ const NewsApiForm = () => {
       <Form.Item
         name={["query", "advancedQuery", "newsApi", "to"]}
         label="To"
+        dependencies={["query", "advancedQuery", "newsApi", "from"]}
+        getValueFromEvent={simpleDateUtils.getValueFromEvent}
+        getValueProps={simpleDateUtils.getValueProps}
         rules={[
           ({ getFieldValue }) => ({
             validator(_, value) {
@@ -112,8 +120,8 @@ const NewsApiForm = () => {
                 "from",
               ]);
 
-              if (!fromValue) return Promise.resolve();
-              if (!value || fromValue <= value) return Promise.resolve();
+              if (!fromValue) return Promise.resolve(value);
+              if (!value || fromValue <= value) return Promise.resolve(value);
 
               return Promise.reject(
                 new Error("To date should be after from date")

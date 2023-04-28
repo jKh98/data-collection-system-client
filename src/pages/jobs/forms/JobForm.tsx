@@ -6,12 +6,12 @@ import {
   Card,
   Col,
   Collapse,
-  DatePicker,
   Form,
   Input,
   InputNumber,
   Row,
   Select,
+  Space,
   Switch,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
@@ -20,9 +20,11 @@ import NewsApiForm from "./NewsApiForm";
 import RedditApiForm from "./RedditApiForm";
 import TwitterApiForm from "./TwitterApiForm";
 
+import DatePicker from "&components/DatePicker";
 import { PageHeader } from "&components/Page";
 import { LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP } from "&config/tooltips";
 import { Paths } from "&constants/paths";
+import { fbTimestampUtils } from "&utils/datePicker";
 import { scheduleToSeconds } from "&utils/schedule";
 
 interface JobFormProps {
@@ -84,7 +86,7 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
             <br />
             <Card title={"Schedule"}>
               <Form.Item label="Interval" required>
-                <Input.Group compact>
+                <Space.Compact>
                   <Form.Item
                     noStyle
                     name={["schedule", "interval"]}
@@ -108,7 +110,7 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
                             );
                           }
 
-                          return Promise.resolve();
+                          return Promise.resolve(interval);
                         },
                       },
                     ]}
@@ -122,12 +124,53 @@ const JobForm = ({ onSubmit, initialValues, submitting }: JobFormProps) => {
                       <Select.Option key={"days"}>days</Select.Option>
                     </Select>
                   </Form.Item>
-                </Input.Group>
+                </Space.Compact>
               </Form.Item>
-              <Form.Item name={["schedule", "startTime"]} label="Start Time">
+              <Form.Item
+                name={["schedule", "startTime"]}
+                label="Start Time"
+                dependencies={["schedule", "endTime"]}
+                getValueFromEvent={fbTimestampUtils.getValueFromEvent}
+                getValueProps={fbTimestampUtils.getValueProps}
+                rules={[
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      const endTime = getFieldValue(["schedule", "endTime"]);
+                      if (!endTime) return Promise.resolve(value);
+                      if (!value || value <= endTime)
+                        return Promise.resolve(value);
+                      return Promise.reject(
+                        new Error("End time should be before start time")
+                      );
+                    },
+                  }),
+                ]}
+              >
                 <DatePicker showTime />
               </Form.Item>
-              <Form.Item name={["schedule", "endTime"]} label="End Time">
+              <Form.Item
+                name={["schedule", "endTime"]}
+                dependencies={["schedule", "startTime"]}
+                label="End Time"
+                getValueFromEvent={fbTimestampUtils.getValueFromEvent}
+                getValueProps={fbTimestampUtils.getValueProps}
+                rules={[
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      const startTime = getFieldValue([
+                        "schedule",
+                        "startTime",
+                      ]);
+                      if (!startTime) return Promise.resolve(value);
+                      if (!value || value >= startTime)
+                        return Promise.resolve(value);
+                      return Promise.reject(
+                        new Error("End time should be after start time")
+                      );
+                    },
+                  }),
+                ]}
+              >
                 <DatePicker showTime />
               </Form.Item>
             </Card>

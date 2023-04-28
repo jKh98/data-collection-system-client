@@ -3,6 +3,8 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   ExclamationCircleOutlined,
+  InfoCircleOutlined,
+  ScheduleOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
 
@@ -13,4 +15,6 @@ export const StatusIcons: {
   active: <CheckCircleOutlined />,
   stopped: <ExclamationCircleOutlined />,
   failed: <CloseCircleOutlined />,
+  finished: <InfoCircleOutlined />,
+  scheduled: <ScheduleOutlined />,
 };

@@ -5,4 +5,6 @@ export const StatusColors: {
   active: "success",
   stopped: "warning",
   failed: "error",
+  finished: "default",
+  scheduled: "default",
 };

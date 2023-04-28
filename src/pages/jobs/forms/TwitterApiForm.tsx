@@ -1,14 +1,11 @@
 import React, { Fragment } from "react";
-import { DatePicker, Form, Input, InputNumber, Select } from "antd";
+import { Form, Input, InputNumber, Select } from "antd";
 
+import DatePicker from "&components/DatePicker";
 import { TWITTER_QUERY_SYNTAX_QUERY_TOOLTIP } from "&config/tooltips";
+import { simpleDateUtils } from "&utils/datePicker";
 
 const TwitterApiForm = () => {
-  //   q
-  // count
-  // result_type
-  // until
-
   return (
     <Fragment>
       <Form.Item
@@ -40,6 +37,8 @@ const TwitterApiForm = () => {
       <Form.Item
         name={["query", "advancedQuery", "twitterApi", "until"]}
         label="Until"
+        getValueFromEvent={simpleDateUtils.getValueFromEvent}
+        getValueProps={simpleDateUtils.getValueProps}
       >
         <DatePicker size="small" />
       </Form.Item>

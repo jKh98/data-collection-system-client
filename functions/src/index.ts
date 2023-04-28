@@ -28,7 +28,7 @@ admin.initializeApp();
 
 const db = admin.firestore();
 
-const PUPPETEER_TIMEOUT = 60000;
+const PUPPETEER_TIMEOUT = 360000;
 const MAX_BROWSER_PAGES = 20;
 
 // browser singleton
@@ -43,6 +43,7 @@ export const initBrowser = async () => {
         "--no-sandbox",
         "--disable-setuid-sandbox",
         "--disable-dev-shm-usage",
+        "--window-size=1920,1080",
       ],
     });
   }
@@ -66,11 +67,10 @@ export async function urlToPdf(resultId: string, url: string, jobId: string) {
 
     const page = await browser.newPage();
     page.setDefaultNavigationTimeout(0);
-    await page.setViewport({ width: 1920, height: 1080 });
 
     // Navigate to the URL.
     await page.goto(url, {
-      waitUntil: "networkidle0",
+      waitUntil: "networkidle2",
       timeout: PUPPETEER_TIMEOUT,
     });
 
@@ -193,6 +193,24 @@ export const buildJob = async (args: BuildJobArgs) => {
   const fcmToken = await getUserFcmToken(userId);
 
   try {
+    const { startTime, endTime } = schedule;
+
+    if (startTime && startTime.toMillis() > jobStart.toMillis()) {
+      console.log(
+        `Job ${id} skipped because it's scheduled to start at ${startTime.toDate()}`
+      );
+      await snapshot.ref.update({ status: "scheduled" });
+      return;
+    }
+
+    if (endTime && endTime.toMillis() < jobStart.toMillis()) {
+      console.log(
+        `Job ${id} skipped because it's scheduled to end at ${endTime.toDate()}`
+      );
+      await snapshot.ref.update({ status: "finished" });
+      return;
+    }
+
     // update status to running
     await snapshot.ref.update({ status: "running" });
 
