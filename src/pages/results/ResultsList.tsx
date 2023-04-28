@@ -5,7 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { Card, Result, Typography } from "antd";
 import Search from "antd/es/input/Search";
 import Table, { ColumnsType } from "antd/es/table";
-import { collection, query, Timestamp, where } from "firebase/firestore";
+import {
+  collection,
+  orderBy,
+  query,
+  Timestamp,
+  where,
+} from "firebase/firestore";
 
 import ResultsKpis from "./ResultsKpis";
 
@@ -32,7 +38,8 @@ const ResultsList = ({ jobId }: ResultsProps) => {
     query(
       collection(store, "results"),
       where("userId", "==", userId),
-      where("jobId", "==", jobId)
+      where("jobId", "==", jobId),
+      orderBy("updatedTime", "desc")
     )
   );
 

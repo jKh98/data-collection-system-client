@@ -5,7 +5,13 @@ import { generatePath, useNavigate } from "react-router-dom";
 import { Button, Result, Space, Table, Tag, Typography } from "antd";
 import Search from "antd/es/input/Search";
 import { ColumnsType } from "antd/es/table";
-import { collection, query, Timestamp, where } from "firebase/firestore";
+import {
+  collection,
+  orderBy,
+  query,
+  Timestamp,
+  where,
+} from "firebase/firestore";
 
 import JobActions from "./JobActions";
 import JobsKpis from "./JobsKpis";
@@ -18,6 +24,8 @@ import { StatusColors } from "&constants/colors";
 import { StatusIcons } from "&constants/icons";
 import { Paths } from "&constants/paths";
 import { scheduleToSeconds } from "&utils/schedule";
+
+const { Text } = Typography;
 
 const JobsList = () => {
   const navigate = useNavigate();
@@ -89,9 +97,9 @@ const JobsList = () => {
         return aSeconds - bSeconds;
       },
       render: ({ interval, unit }) => (
-        <Typography.Text code>
+        <Text code style={{ whiteSpace: "nowrap" }}>
           {interval} {unit}
-        </Typography.Text>
+        </Text>
       ),
     },
     {

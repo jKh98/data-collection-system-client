@@ -65,10 +65,12 @@ export async function urlToPdf(resultId: string, url: string, jobId: string) {
     }
 
     const page = await browser.newPage();
+    page.setDefaultNavigationTimeout(0);
+    await page.setViewport({ width: 1920, height: 1080 });
 
     // Navigate to the URL.
     await page.goto(url, {
-      waitUntil: "domcontentloaded",
+      waitUntil: "networkidle0",
       timeout: PUPPETEER_TIMEOUT,
     });
 

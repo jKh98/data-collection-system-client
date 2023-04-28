@@ -41,7 +41,7 @@ function App() {
   // Firebase messaging
   onMessage(messaging, (payload) => {
     console.log("Message received. ", payload);
-    notification.info({
+    notification.open({
       message: payload.notification?.title,
       description: payload.notification?.body,
       type: payload.data?.type as any,

@@ -76,19 +76,23 @@ async function searchTwitterApi(query: SearchQuery): Promise<SearchResult[]> {
 
   const tweets = response.data.statuses;
 
+  const extractValuesAndJoin = (obj: any, key: string) =>
+    Object.values(obj)
+      .map((value: any) => (key ? value[key] : value))
+      .join(", ");
+
   return tweets.map(
     (tweet: any) =>
       ({
         id: idToHash(tweet.id_str),
         source: "twitterApi",
         title: `Tweet by ${tweet.user.name} (@${tweet.user.screen_name})`,
-        description: `User description: ${tweet.user.description}\nHashtags: ${
-          tweet.entities.hashtags
-        }\nMentions: ${tweet.entities.user_mentions}\nSymbols: ${
-          tweet.entities.symbols
-        }\nURLs: ${Object.values(tweet.entities.urls).map(
-          (url: any) => url.url
-        )}`,
+        description: `User description: ${tweet.user.description}<br/>
+        Hashtags: ${extractValuesAndJoin(tweet.entities.hashtags, "text")}
+        Mentions: ${extractValuesAndJoin(tweet.entities.user_mentions, "name")}
+        Symbols: ${extractValuesAndJoin(tweet.entities.symbols, "text")}
+        URLs: ${extractValuesAndJoin(tweet.entities.urls, "url")}
+        `,
         content: tweet.text,
         imageUrl: tweet?.entities?.media?.[0]?.media_url || null,
         url: `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`,

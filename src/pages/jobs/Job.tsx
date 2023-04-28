@@ -92,7 +92,7 @@ const Job = () => {
             <DataRow
               title="Schedule"
               value={
-                <Text code>
+                <Text code style={{ whiteSpace: "nowrap" }}>
                   {interval} {unit}
                 </Text>
               }

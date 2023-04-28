@@ -32,3 +32,5 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DATA_COLLECTION_SYSTEM_D20BF }}'
           projectId: data-collection-system-d20bf
+      - name: Cleanup
+        run: rm .env
