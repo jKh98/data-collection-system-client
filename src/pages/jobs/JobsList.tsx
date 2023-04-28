@@ -5,13 +5,7 @@ import { generatePath, useNavigate } from "react-router-dom";
 import { Button, Result, Space, Table, Tag, Typography } from "antd";
 import Search from "antd/es/input/Search";
 import { ColumnsType } from "antd/es/table";
-import {
-  collection,
-  orderBy,
-  query,
-  Timestamp,
-  where,
-} from "firebase/firestore";
+import { collection, query, Timestamp, where } from "firebase/firestore";
 
 import JobActions from "./JobActions";
 import JobsKpis from "./JobsKpis";
