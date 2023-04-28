@@ -189,28 +189,43 @@ export const buildLocalJob = async (args: BuildLocalJobArgs) => {
 
 export const buildJob = async (args: BuildJobArgs) => {
   const { snapshot, jobStart } = args;
-  const { id, userId, schedule, query } = snapshot.data() as SearchJob;
+  const { id, userId, schedule, query, nextRunTime } =
+    snapshot.data() as SearchJob;
   const fcmToken = await getUserFcmToken(userId);
 
+  const { startTime, endTime } = schedule;
+
+  if (startTime && startTime.toMillis() > jobStart.toMillis()) {
+    console.log(
+      `Job ${id} skipped because it's scheduled to start at ${startTime.toDate()}`
+    );
+
+    let newNextRunTime = null;
+
+    if (nextRunTime) {
+      newNextRunTime = nextRunTime;
+    } else {
+      newNextRunTime = admin.firestore.Timestamp.fromMillis(
+        startTime.toMillis() + scheduleToSeconds(schedule) * 1000
+      );
+    }
+
+    await snapshot.ref.update({
+      status: "scheduled",
+      nextRunTime: newNextRunTime,
+    });
+    return;
+  }
+
+  if (endTime && endTime.toMillis() < jobStart.toMillis()) {
+    console.log(
+      `Job ${id} skipped because it's scheduled to end at ${endTime.toDate()}`
+    );
+    await snapshot.ref.update({ status: "finished", nextRunTime: null });
+    return;
+  }
+
   try {
-    const { startTime, endTime } = schedule;
-
-    if (startTime && startTime.toMillis() > jobStart.toMillis()) {
-      console.log(
-        `Job ${id} skipped because it's scheduled to start at ${startTime.toDate()}`
-      );
-      await snapshot.ref.update({ status: "scheduled" });
-      return;
-    }
-
-    if (endTime && endTime.toMillis() < jobStart.toMillis()) {
-      console.log(
-        `Job ${id} skipped because it's scheduled to end at ${endTime.toDate()}`
-      );
-      await snapshot.ref.update({ status: "finished" });
-      return;
-    }
-
     // update status to running
     await snapshot.ref.update({ status: "running" });
 

@@ -1,4 +1,4 @@
-import { Timestamp } from "firebase-admin/firestore";
+import { Timestamp } from "firebase/firestore";
 
 declare global {
   /**
@@ -62,7 +62,13 @@ declare global {
 
   type dataSource = "newsApi" | "twitterApi" | "redditApi";
 
-  type jobStatus = "running" | "active" | "stopped" | "failed";
+  type jobStatus =
+    | "running"
+    | "active"
+    | "stopped"
+    | "failed"
+    | "finished"
+    | "scheduled";
 
   type intervalUnit = "minutes" | "hours" | "days";
 

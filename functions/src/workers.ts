@@ -88,10 +88,13 @@ async function searchTwitterApi(query: SearchQuery): Promise<SearchResult[]> {
         source: "twitterApi",
         title: `Tweet by ${tweet.user.name} (@${tweet.user.screen_name})`,
         description: `User description: ${tweet.user.description}<br/>
-        Hashtags: ${extractValuesAndJoin(tweet.entities.hashtags, "text")}
-        Mentions: ${extractValuesAndJoin(tweet.entities.user_mentions, "name")}
-        Symbols: ${extractValuesAndJoin(tweet.entities.symbols, "text")}
-        URLs: ${extractValuesAndJoin(tweet.entities.urls, "url")}
+        Hashtags: ${extractValuesAndJoin(tweet.entities.hashtags, "text")}<br/>
+        Mentions: ${extractValuesAndJoin(
+          tweet.entities.user_mentions,
+          "name"
+        )}<br/>
+        Symbols: ${extractValuesAndJoin(tweet.entities.symbols, "text")}<br/>
+        URLs: ${extractValuesAndJoin(tweet.entities.urls, "url")}<br/>
         `,
         content: tweet.text,
         imageUrl: tweet?.entities?.media?.[0]?.media_url || null,
@@ -121,7 +124,13 @@ async function searchRedditApi(query: SearchQuery): Promise<SearchResult[]> {
         id: idToHash(post.data.id),
         source: "redditApi",
         title: post.data.title,
-        description: post.data.selftext,
+        description: `Subreddit: ${post.data.subreddit_name_prefixed}<br/>
+        Author: ${post.data.author}<br/>
+        Score: ${post.data.score}<br/>
+        Upvotes: ${post.data.ups}<br/>
+        Downvotes: ${post.data.downs}<br/>
+        Comments: ${post.data.num_comments}<br/>
+        `,
         content: post.data.selftext_html || post.data.selftext,
         url: `https://www.reddit.com${post.data.permalink}`,
         imageUrl: post.data.preview?.images?.[0]?.source?.url || null,
