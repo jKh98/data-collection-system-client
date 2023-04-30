@@ -11,7 +11,7 @@ import { workers } from "./workers";
 type snapshotType =
   admin.firestore.QueryDocumentSnapshot<admin.firestore.DocumentData>;
 
-interface BuildLocalJobArgs {
+interface UpsertResultForSourceArgs {
   id: string;
   userId: string;
   fcmToken: string;
@@ -19,7 +19,7 @@ interface BuildLocalJobArgs {
   query: SearchQuery;
 }
 
-interface BuildJobArgs {
+interface ExecuteScheduledJobArgs {
   snapshot: snapshotType;
   jobStart: admin.firestore.Timestamp;
 }
@@ -119,7 +119,9 @@ const getUserFcmToken = async (userId: string) => {
   return fcmToken;
 };
 
-export const buildLocalJob = async (args: BuildLocalJobArgs) => {
+export const upsertResultForSource = async (
+  args: UpsertResultForSourceArgs
+) => {
   const { id, userId, source, query, fcmToken } = args;
 
   try {
@@ -187,7 +189,7 @@ export const buildLocalJob = async (args: BuildLocalJobArgs) => {
   }
 };
 
-export const buildJob = async (args: BuildJobArgs) => {
+export const executeScheduledJob = async (args: ExecuteScheduledJobArgs) => {
   const { snapshot, jobStart } = args;
   const { id, userId, schedule, query, nextRunTime } =
     snapshot.data() as SearchJob;
@@ -233,7 +235,13 @@ export const buildJob = async (args: BuildJobArgs) => {
     const results = await Promise.all(
       query.sources.map(
         async (source: dataSource) =>
-          await buildLocalJob({ id: id!, userId, source, query, fcmToken })
+          await upsertResultForSource({
+            id: id!,
+            userId,
+            source,
+            query,
+            fcmToken,
+          })
       )
     );
 
@@ -316,7 +324,7 @@ export const jobScheduler = functions
       // Loop over documents and push jobs to array.
       jobDocs.forEach((snapshot) => {
         // Push job to array.
-        jobs.push(buildJob({ snapshot, jobStart }));
+        jobs.push(executeScheduledJob({ snapshot, jobStart }));
       });
 
       console.log(`Executing ${jobs.length} jobs...`);

@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 import { Form, Input, InputNumber, Select } from "antd";
 
 import DatePicker from "&components/DatePicker";
-import { TWITTER_QUERY_SYNTAX_QUERY_TOOLTIP } from "&config/tooltips";
+import { TWITTER_QUERY_SYNTAX_QUERY_TOOLTIP } from "&constants/tooltips";
 import { simpleDateUtils } from "&utils/datePicker";
 
 const TwitterApiForm = () => {

@@ -3,7 +3,7 @@ import { Form, Input, Select } from "antd";
 import moment from "moment";
 
 import DatePicker from "&components/DatePicker";
-import { LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP } from "&config/tooltips";
+import { LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP } from "&constants/tooltips";
 import { simpleDateUtils } from "&utils/datePicker";
 
 type source = { id: string; name: string };
@@ -22,7 +22,7 @@ const NewsApiForm = () => {
       setIsLoadingSources(true);
       const response = await fetch(`${url}?apiKey=${apiKey}`);
       const data = await response.json();
-      setSources(data.sources);
+      setSources(data.sources?.filter((s: any) => s.id !== "google-news-is"));
       setIsLoadingSources(false);
     };
 

@@ -22,7 +22,7 @@ import TwitterApiForm from "./TwitterApiForm";
 
 import DatePicker from "&components/DatePicker";
 import { PageHeader } from "&components/Page";
-import { LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP } from "&config/tooltips";
+import { LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP } from "&constants/tooltips";
 import { Paths } from "&constants/paths";
 import { fbTimestampUtils } from "&utils/datePicker";
 import { scheduleToSeconds } from "&utils/schedule";

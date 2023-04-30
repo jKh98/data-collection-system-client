@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import { Form, Input, InputNumber, Select } from "antd";
 
-import { LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP } from "&config/tooltips";
+import { LUCENE_QUERY_SYNTAX_QUERY_TOOLTIP } from "&constants/tooltips";
 
 const RedditApiForm = () => {
   return (

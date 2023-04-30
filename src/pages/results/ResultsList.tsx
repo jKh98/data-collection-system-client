@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo } from "react";
+import React, { Fragment, useEffect, useMemo } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { generatePath, useNavigate } from "react-router-dom";
@@ -28,7 +28,13 @@ const ResultsList = ({ jobId }: ResultsProps) => {
   const navigate = useNavigate();
   const [user] = useAuthState(auth);
   const userId = user?.uid;
-  const [search, setSearch] = React.useState<string>("");
+  const [search, setSearch] = React.useState<string>(
+    sessionStorage.getItem("search") || ""
+  );
+
+  useEffect(() => {
+    sessionStorage.setItem("search", search);
+  }, [search]);
 
   /**
    * Get all results for the current user
@@ -110,6 +116,7 @@ const ResultsList = ({ jobId }: ResultsProps) => {
         <Search
           placeholder="Search by id, name, description, or content"
           onChange={onSearch}
+          value={search}
           style={{ marginBottom: 16 }}
         />
         <Table
@@ -119,6 +126,7 @@ const ResultsList = ({ jobId }: ResultsProps) => {
           loading={loading}
           pagination={{ defaultPageSize: 10 }}
           rowKey={"id"}
+          scroll={{ x: 500 }}
           rowClassName={"clickable"}
           onRow={({ id }) => ({
             onClick: () => navigate(generatePath(Paths.Result, { id })),

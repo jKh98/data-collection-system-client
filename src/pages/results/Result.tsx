@@ -120,6 +120,8 @@ const Result = () => {
               Download PDF
             </Button>
           )}
+          <br />
+          <br />
         </Col>
         <Col xs={24} sm={24} md={16} lg={16} xl={16}>
           <Card
