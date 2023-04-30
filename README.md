@@ -368,8 +368,11 @@ repo
 ### ✅ Prerequisites
 
 Before you begin, ensure that you have the following prerequisites installed:
-> `[📌  INSERT-PROJECT-PREREQUISITES]`
 
+- Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager. (functions require Node v16)
+- Firebase CLI - [Download & Install Firebase CLI](https://firebase.google.com/docs/cli#install_the_firebase_cli)
+- Git - [Download & Install Git](https://git-scm.com/downloads). OSX and Linux machines typically have this already installed.
+- Yarn - [Download & Install Yarn](https://yarnpkg.com/en/docs/install#windows-stable). Yarn is a performant package manager for JavaScript and replaces the npm client. It is not strictly necessary, but highly encouraged.
 ### 💻 Installation
 
 1. Clone the data-collection-system-client repository:
@@ -387,13 +390,51 @@ Before you begin, ensure that you have the following prerequisites installed:
 3. Install the dependencies:
 
     ```sh
-    npm install
+    npm install 
     ```
+    
+or 
+
+    ```sh
+    yarn install 
+    ```
+
+4. Run the app:
+
+    ```sh
+    npm start
+    ```
+
+5. To deploy the app and functions to firebase:
+
+    ```sh
+    npm run deploy
+    ```
+
+6. To install firebase functions:
+
+    ```sh
+    cd functions && npm install
+    ```
+
+7. To run firebase functions locally:
+
+    ```sh
+    cd functions && npm run serve
+    ```
+
+8. To deploy firebase functions only:
+
+    ```sh
+    cd functions && npm run deploy
+    ```
+
+
 
 ### 🤖 Using data-collection-system-client
 
 ```sh
-npm run build && node dist/main.js
+npm run build
 ```
 
 ### 🧪 Running Tests
